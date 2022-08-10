@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>Novo Orçamento</title>
+    <link rel='stylesheet' href='index.css'>
+    <link href="https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:wght@400;700&display=swap" rel="stylesheet">
+    <script src='index.js'></script>
+</head>
+
+<body>
+    <div class="content">
+        <img id="termedic" src="../../assets/termedic.png" alt="termedic">
+
+        <h1>Informações da Mesa</h1>
+        <p id="mate">Escolha o material</p>
+        <div class="selectDiv">
+            <img id="rmv" src="../../assets/dButton.png" alt="termedic">
+            <select onchange="showOpts()" name="Materiais" id="materials">
+                <option value=""></option>
+            </select>
+        </div>
+
+        <select name="options" id="options">
+            <option value=""></option>
+        </select>
+
+        <div class="inputs2">
+            <input type="number" id="bob" placeholder="Larg. Bobina em mm">
+            <input type="number" id="esp" placeholder="Espessura em mm">
+        </div>
+
+        <div class="inputs">
+            <input type="number" name="l1" id="l1" placeholder="Lado 1 em mm">
+            <input type="number" name="l2" id="l2" placeholder="Lado 2 em mm">
+        </div>
+
+        <input type="number" id="cav" placeholder="Número de Cavidades">
+        <img src="../../assets/arrow.png" alt="arrow" id="back">
+        <img src="../../assets/arrow-right.png" alt="arrow" id="right">
+
+        <p id="info"></p>
+
+    </div>
+    <button type="button" id="addMP" onclick="addMP()">Adicionar MP</button>
+</body>
+
+</html>
