@@ -84,7 +84,7 @@ ipcMain.on("showError", (event, arg) => {
 })
 
 ipcMain.on("showMsg", (event, arg) => {
-    dialog.showMessageBox(mainWin, {
+    dialog.showMessageBox(BrowserWindow.getFocusedWindow(), {
         message: arg[0],
         type: "info",
         title: arg[1]

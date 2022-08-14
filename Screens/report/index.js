@@ -44,16 +44,18 @@ async function addText(id, text, mod = false, personalizedClass = false, classP 
         localStorage.setItem(id, 0)
         let json = {}
         json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
+
         if (json["qtde"] == undefined) json["qtde"] = parseFloat(text)
         else if (json["conj"] == undefined) json["conj"] = parseFloat(text)
         await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(json))
+
         json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
         p.addEventListener("click", async (e) => {
             localStorage.setItem("modify", e.target.className)
             ipcRenderer.send("modifyInfo")
         })
     }
-    
+
     document.getElementById(id).appendChild(p)
 }
 
@@ -130,7 +132,7 @@ window.onload = async () => {
 
             totalMP = parseFloat((preco[localStorage.getItem("mpSelected")] * parseFloat(json["qtde"]).toFixed(4))
                 * parseFloat(json["conj"]).toFixed(4)).toFixed(2)
-            console.log(totalMP)
+            // console.log(totalMP)
             document.querySelector("p.rstotal").textContent = "R$ " + totalMP
         }, 1000)
 
@@ -148,8 +150,8 @@ window.onload = async () => {
 
         addTitle("mp", "Operações", "opera")
         addTitle("desc", "Centro de Custos", "cc")
-        addTitle("rsuni", "Horas Médias", "hour")
-        addTitle("unid", "Horas Máximas", "hourM")
+        addTitle("rsuni", "Média Hora", "hour")
+        addTitle("unid", "Hora Máxima", "hourM")
         addTitle("qtde", "Taxa Hora MOD", "taxa")
         addTitle("conj", "Custo Médio", "medio")
         addTitle("rstotal", "Custo Máximo", "max")
@@ -160,7 +162,7 @@ window.onload = async () => {
 
         operations = operations.sort()
         for (i in operations) {
-            addText("opera", operations[i])
+            addText("opera", String(operations[i]).split(" - ")[0])
             addText("cc", await getCC(operations[i]))
             addText("hour", await tempo(operations[i], true))
             addText("hourM", await tempo(operations[i], false))
@@ -174,6 +176,7 @@ window.onload = async () => {
 
             totalMedio += parseFloat(custoMedio)
             totalMaximo += parseFloat(custoMaximo)
+            console.log(i)
             addText("medio", "R$ " + custoMedio)
             addText("max", "R$ " + custoMaximo)
             // console.log(Array(localStorage.getItem("operations")))
@@ -217,6 +220,6 @@ window.onload = async () => {
             document.querySelector("p.geralMax").textContent = "R$ " + parseFloat(parseFloat(totalMP) + totalMaximo).toFixed(2)
         }, 1000);
 
-        console.log(totalMedio, totalMaximo)
+        // console.log(totalMedio, totalMaximo)
     }
 }

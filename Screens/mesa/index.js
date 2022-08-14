@@ -4,11 +4,6 @@ const { join } = require("path")
 
 let mp
 
-// document.addEventListener('keydown', function (event) {
-//     if (event.keyCode !== 13) return;
-//     calc()
-// })
-
 window.onload = async () => {
     document.getElementById("back").addEventListener("click", () => ipcRenderer.send("back"))
     document.getElementById("options").style.display = "none"
@@ -125,7 +120,6 @@ async function removeMP() {
         for (i in json) {
             if (i === value) delete json[i]
         }
-        console.log(json)
         json = JSON.stringify(json)
         await fs.writeFileSync(join(__dirname, "..", "..", localStorage.getItem("empresa") == "EMBAMED" ?
             "mpEmb.json" : "mpTerm.json"), json)
