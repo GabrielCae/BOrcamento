@@ -11,8 +11,18 @@
 </head>
 
 <body>
-    <img src="../../assets/arrow.png" alt="arrow" id="back">
-    <h1 id="title">Orçamento</h1>
+    <div class="titles">
+        <div class="termedic">
+            <img src="../../assets/termedic.png" alt="certified">
+            <p>Ajapi, Rio Claro</p>
+            <h3 id="title">Orçamento - ID</h1>
+        </div>
+        <div class="certified">
+            <img src="../../assets/certified.png" alt="certified">
+            <p id="data">Data</p>
+            <h3>Sintegra Sciencies</h1>
+        </div>
+    </div>
     <div class="table-responsive">
         <table class="table">
             <thead>
@@ -23,17 +33,11 @@
                     <th id="desc">
                         <p class="title">Descrição</p>
                     </th>
-                    <th id="rsuni">
-                        <p class="title">R$ Unit.</p>
+                    <th id="rsunim">
+                        <p class="title">R$ Unit. Médio</p>
                     </th>
-                    <th id="unid">
-                        <p class="title">Unidade</p>
-                    </th>
-                    <th id="qtde">
-                        <p class="title">Qtde.</p>
-                    </th>
-                    <th id="conj">
-                        <p class="title">Conjunto</p>
+                    <th id="rsunima">
+                        <p class="title">R$ Unit. Máximo</p>
                     </th>
                     <th id="rstotal">
                         <p class="title">R$ Total</p>
@@ -41,15 +45,6 @@
                 </tr>
             </thead>
         </table>
-    </div>
-    <div class="btn">
-        <button onclick="importar()" id="import">Importar</button>
-        <img src="../../assets/help.png" alt="help" id="help">
-    </div>
-
-    <div class="options">
-        <img src="../../assets/confirm.png" alt="confirm" id="imgConfirm">
-        <!-- <img src="../../assets/add.png" alt="add" id="imgAdd"> -->
     </div>
 
 </body>

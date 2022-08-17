@@ -3,6 +3,7 @@ const fs = require("fs")
 const { join } = require("path")
 
 let mp
+let name
 
 window.onload = async () => {
     document.getElementById("back").addEventListener("click", () => ipcRenderer.send("back"))
@@ -28,6 +29,7 @@ window.onload = async () => {
 
     document.getElementById("right").addEventListener("click", () => {
         localStorage.setItem("mpSelected", mp)
+        localStorage.setItem("opt", name)
         ipcRenderer.send("operations")
     })
 
@@ -50,7 +52,7 @@ function error(text) {
     ipcRenderer.send("showError", ["Alerta", text])
 }
 
-function calc() {
+async function calc() {
     let l1 = document.getElementById("l1").value
     let l2 = document.getElementById("l2").value
     let esp = document.getElementById("esp").value
@@ -72,6 +74,13 @@ function calc() {
             let totalPC = parseFloat(massa / cav).toFixed(4)
 
             document.getElementById("info").textContent = "Peso (kg): " + massa + " - Total p/ Pç: " + totalPC
+
+            json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
+
+            json["qtde"] = totalPC
+            json["conj"] = 1
+            await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(json))
+    
             localStorage.setItem("info", [massa, totalPC])
         }
 
@@ -87,6 +96,12 @@ function calc() {
             let percakg = parseFloat(kgPC * 0.2)
             let totalPC = parseFloat(kgPC + percakg).toFixed(4)
 
+            json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
+
+            json["qtde"] = totalPC
+            json["conj"] = 1
+            await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(json))
+
             document.getElementById("info").textContent = "Peso (kg): " + kgPC.toFixed(4) + " - Total p/ Pç: " + totalPC
             localStorage.setItem("info", [kgPC, totalPC])
         }
@@ -100,6 +115,12 @@ function calc() {
             let pesoFolha = 0.022
             let medidaFolha = 445 * 635
             let totalPC = parseFloat((areaTotal * pesoFolha) / medidaFolha).toFixed(4)
+
+            json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
+
+            json["qtde"] = totalPC
+            json["conj"] = 1
+            await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(json))
 
             document.getElementById("info").textContent = "Área Total: " + areaTotal + " - Total p/ Pç: " + totalPC
             localStorage.setItem("info", [areaTotal, totalPC])
@@ -193,10 +214,17 @@ async function showOpts() {
     let select = document.getElementById('materials');
     let selectValue = select.options[select.selectedIndex].textContent;
 
+    let selectOpt = document.getElementById('options');
+    let selectOptValue = selectOpt.options[selectOpt.selectedIndex].textContent;
+
     if (selectValue != "") {
         document.getElementById("options").style.display = "grid"
         mp = String(selectValue).toUpperCase()
-        document.getElementById("options").addEventListener("change", () => adjustInputs())
+        document.getElementById("options").addEventListener("change", e => {
+            adjustInputs()
+            name = e.target.value
+            // console.log(selectOptValue.textContent)    
+        })
         await addOptions()
     } else document.getElementById("options").style.display = "none"
 }

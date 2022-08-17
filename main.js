@@ -91,6 +91,25 @@ ipcMain.on("showMsg", (event, arg) => {
     })
 })
 
+ipcMain.on("orcamentPDF", async () => {
+    if (valueChangeWin == undefined) {
+        valueChangeWin = new BrowserWindow({
+            width: 1080,
+            height: 720,
+            center: true,
+            autoHideMenuBar: true,
+            show: true,
+            webPreferences: {
+                contextIsolation: false,
+                nodeIntegration: true,
+            }
+        })
+        valueChangeWin.on("close", () => valueChangeWin = undefined)
+    } else valueChangeWin.focus()
+
+    valueChangeWin.loadFile(join(__dirname, "Screens", "orcamentPDF", "index.html"))
+})
+
 ipcMain.on("importInfo", async () => {
     if (valueChangeWin == undefined) {
         valueChangeWin = new BrowserWindow({

@@ -42,14 +42,7 @@ async function addText(id, text, mod = false, personalizedClass = false, classP 
     if (mod) {
         p.id = "mod"
         localStorage.setItem(id, 0)
-        let json = {}
-        json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
 
-        if (json["qtde"] == undefined) json["qtde"] = parseFloat(text)
-        else if (json["conj"] == undefined) json["conj"] = parseFloat(text)
-        await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(json))
-
-        json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
         p.addEventListener("click", async (e) => {
             localStorage.setItem("modify", e.target.className)
             ipcRenderer.send("modifyInfo")
@@ -96,11 +89,47 @@ ipcRenderer.on("reportData", async (event, arg) => {
 
 })
 
+function info(text) {
+    ipcRenderer.send("showMsg", [text, "Info"])
+}
+
 window.onload = async () => {
+    // document.getElementById("imgAdd").addEventListener("click", () => {
+    //     let itens = []
+    //     let operations = perform()
+
+    //     if (localStorage.getItem("itens") != null) itens.push(localStorage.getItem("itens").split(","))
+    //     localStorage.setItem("itens",
+    //         itens == [] ?
+    //             [
+    //                 localStorage.getItem("mpSelected"),
+    //                 localStorage.getItem("opt"),
+    //                 operations
+    //             ]
+    //             :
+    //             Array(itens, [
+    //                 localStorage.getItem("mpSelected"),
+    //                 localStorage.getItem("opt"),
+    //                 operations
+    //             ])
+    //     )
+    //     console.log(localStorage.getItem("itens"))
+    // })
+    document.getElementById("imgConfirm").addEventListener("click", async () => {
+        if (fs.existsSync(join(__dirname, "..", "..", "orcamentos.json"))) {
+            let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+            console.log()
+        } else {
+            await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"),
+            JSON.stringify({0: "teste", 1: "test"}))
+        }
+
+        // ipcRenderer.send("orcamentPDF")
+    })
+
     document.getElementById("back").addEventListener("click", () => ipcRenderer.send("backOpera"))
     document.getElementById("help").addEventListener("click",
-        () => ipcRenderer.send("showMsg",
-            ["Monte uma planilha com o seguinte formato: \n\nCentro de Custo (Coluna A) - Valor (Coluna B)", "Info"]))
+        () => info("Monte uma planilha com o seguinte formato: \n\nCentro de Custo (Coluna A) - Valor (Coluna B)"))
     if (!fs.existsSync(join(__dirname, "..", "..", "cc.json"))) {
         document.querySelector("table.table").style.display = "none"
         document.getElementById("title").textContent = "Importe os Centro de Custos"
@@ -110,13 +139,16 @@ window.onload = async () => {
         let operations = perform()
 
         // MP
-        await addText("mp", "xxxxxx")
-        await addText("desc", localStorage.getItem("mpSelected"))
-        let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", localStorage.getItem("empresa") == "EMBAMED" ?
-            "mpEmb.json" : "mpTerm.json")))
-        await addText("rsuni", parseFloat(preco[localStorage.getItem("mpSelected")]).toFixed(2))
+        await addText("mp", localStorage.getItem("mpSelected"))
+        await addText("desc", localStorage.getItem("opt"))
+        let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..",
+            localStorage.getItem("empresa") == "EMBAMED" ?
+                "mpEmb.json" : "mpTerm.json")))
+        await addText("rsuni", String(parseFloat(preco[localStorage.getItem("mpSelected")]).toFixed(2))
+            .replace(".", ","))
         await addText("unid", "kg")
-        await addText("qtde", parseFloat(localStorage.getItem("info").split(",")[1]).toFixed(3), true)
+        await addText("qtde", String(parseFloat(localStorage.getItem("info").split(",")[1]).toFixed(4))
+            .replace(".", ","), true)
         await addText("conj", 1, true)
         await addText("rstotal", "R$ " + 0)
 
@@ -127,13 +159,15 @@ window.onload = async () => {
             if (fs.existsSync(join(__dirname, "..", "..", "config.json"))) {
                 json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
             }
-            document.querySelector("p.qtde").textContent = parseFloat(json["qtde"]).toFixed(3)
+            document.querySelector("p.qtde").textContent = String(parseFloat(json["qtde"]).toFixed(4))
+                .replace(".", ",")
             document.querySelector("p.conj").textContent = parseFloat(json["conj"]).toFixed(0)
 
             totalMP = parseFloat((preco[localStorage.getItem("mpSelected")] * parseFloat(json["qtde"]).toFixed(4))
-                * parseFloat(json["conj"]).toFixed(4)).toFixed(2)
+                * parseFloat(json["conj"]).toFixed(4)).toFixed(4)
             // console.log(totalMP)
-            document.querySelector("p.rstotal").textContent = "R$ " + totalMP
+            document.querySelector("p.rstotal").textContent = String("R$ " + parseFloat(totalMP).toFixed(2))
+                .replace(".", ",")
         }, 1000)
 
         // espaçamento
@@ -166,9 +200,10 @@ window.onload = async () => {
             addText("cc", await getCC(operations[i]))
             addText("hour", await tempo(operations[i], true))
             addText("hourM", await tempo(operations[i], false))
-            addText("taxa", "R$ " + parseFloat(await getValueCC(await getCC(operations[i]))).toFixed(2))
-            // console.log(tempo(operations[i], true, true))
+            addText("taxa", String("R$ " + parseFloat(await getValueCC(await getCC(operations[i]))).toFixed(2))
+                .replace(".", ","))
 
+            // console.log(operations[i])
             let custoMedio = parseFloat(await tempo(operations[i], true, true) *
                 await getValueCC(await getCC(operations[i]))).toFixed(2)
             let custoMaximo = parseFloat(await tempo(operations[i], false, true) *
@@ -176,10 +211,9 @@ window.onload = async () => {
 
             totalMedio += parseFloat(custoMedio)
             totalMaximo += parseFloat(custoMaximo)
-            console.log(i)
-            addText("medio", "R$ " + custoMedio)
-            addText("max", "R$ " + custoMaximo)
-            // console.log(Array(localStorage.getItem("operations")))
+            // console.log(i)
+            addText("medio", "R$ " + String(custoMedio).replace(".", ","))
+            addText("max", "R$ " + String(custoMaximo).replace(".", ","))
         }
 
         // GERAIS
@@ -195,8 +229,10 @@ window.onload = async () => {
         addBr("max")
 
         addText("taxa", "Total MOD: ")
-        addText("medio", "R$ " + parseFloat(totalMedio).toFixed(2))
-        addText("max", "R$ " + parseFloat(totalMaximo).toFixed(2))
+        addText("medio", "R$ " + String(parseFloat(totalMedio).toFixed(2))
+            .replace(".", ","))
+        addText("max", "R$ " + String(parseFloat(totalMaximo).toFixed(2))
+            .replace(".", ","))
 
 
         for (i = 0; i < 2; i++) {
@@ -216,8 +252,10 @@ window.onload = async () => {
         addBr("medio")
         addBr("max")
         setInterval(() => {
-            document.querySelector("p.geralMedio").textContent = "R$ " + parseFloat(parseFloat(totalMP) + totalMedio).toFixed(2)
-            document.querySelector("p.geralMax").textContent = "R$ " + parseFloat(parseFloat(totalMP) + totalMaximo).toFixed(2)
+            document.querySelector("p.geralMedio").textContent = "R$ " + String(parseFloat(parseFloat(totalMP) + totalMedio).toFixed(2))
+                .replace(".", ",")
+            document.querySelector("p.geralMax").textContent = "R$ " + String(parseFloat(parseFloat(totalMP) + totalMaximo).toFixed(2))
+                .replace(".", ",")
         }, 1000);
 
         // console.log(totalMedio, totalMaximo)

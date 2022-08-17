@@ -7,12 +7,29 @@ body {
     justify-content: center;
 }
 
-.btn {
+.titles {
     justify-content: center;
     display: flex;
     align-items: center;
     text-align: center;
 }
+
+.termedic, .certified {
+    justify-content: center;
+    display: grid;
+    align-items: center;
+    text-align: center;
+}
+
+.termedic img {
+    margin-bottom: 13px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* .titles h3 {
+    margin-right: 20px;
+} */
 
 .options {
     display: flex;
@@ -50,10 +67,6 @@ button#import {
     font-weight: 400;
 
     color: #FFFFFF;
-}
-
-button#import:hover {
-    cursor: pointer;
 }
 
 p#mod {
@@ -106,43 +119,10 @@ th {
     padding-right: 20px;
 }
 
-img {
-    cursor: pointer;
-}
-
-img#rmv {
-    display: flex;
-    width: 50px;
-    height: 50px;
-}
-
-img#help {
-    position: absolute;
-    height: 35px;
-    width: 35px;
-    margin-left: 200px;
-}
-
 img#back {
     position: fixed;
     height: 25px;
     width: 25px;
     top: 20px;
     left: 20px;
-}
-
-input {
-    height: 12px;
-    width: 12px;
-    inline-size: none;
-    user-select: 0;
-}
-
-img#right {
-    height: 45px;
-    width: 45px;
-    position: fixed;
-    bottom: 20px;
-    right: 25px;
-    cursor: pointer;
 }
