@@ -27,7 +27,8 @@ function loadOrcament() {
     let selectValue = select.options[select.selectedIndex].textContent;
 
     if (selectValue != "") {
-        localStorage.setItem("onlyView", true)
+        localStorage.setItem("onlyView", 1)
+        select.value = ""
         localStorage.setItem("idToView", parseInt(selectValue))
         ipcRenderer.send("loadOrcament")
     }

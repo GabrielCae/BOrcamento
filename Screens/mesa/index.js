@@ -77,7 +77,7 @@ async function calc() {
 
             json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
 
-            json["qtde"] = totalPC
+            localStorage.setItem("qtde", totalPC)
             json["conj"] = 1
             await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(json))
     
@@ -98,7 +98,7 @@ async function calc() {
 
             json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
 
-            json["qtde"] = totalPC
+            localStorage.setItem("qtde", totalPC)
             json["conj"] = 1
             await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(json))
 
@@ -118,7 +118,7 @@ async function calc() {
 
             json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
 
-            json["qtde"] = totalPC
+            localStorage.setItem("qtde", totalPC)
             json["conj"] = 1
             await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(json))
 

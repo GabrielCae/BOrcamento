@@ -10,8 +10,8 @@ async function addText(id, text, orc = true, classP = "") {
     if (classP != "") p.className = classP
     else p.className = id
 
-    console.log(localStorage.getItem("onlyView"))
-    if (orc) 
+    // console.log(localStorage.getItem("onlyView"))
+    if (orc)
         orcament.push(text)
 
     document.getElementById(id).appendChild(p)
@@ -38,25 +38,31 @@ async function addBr(id) {
 
 let id = 0
 
-window.onload = async () => {
-    if (localStorage.getItem("onlyView") == true) {
+function isUpperCase(str) {
+    return String(str) === String(str).toUpperCase();
+}
 
+window.onload = async () => {
+    if (localStorage.getItem("onlyView") == 1) {
+        console.log("AAA")
         let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
         let infos = []
         for (i in data) {
             if (i == localStorage.getItem("idToView")) infos = data[i]
         }
 
-        addText("mp", infos[0][0], false)
-        addText("desc", infos[0][1], false)
-        addText("rsunim", infos[0][2], false)
-        addText("rsunima", infos[0][3], false)
-        addText("rstotal", infos[0][4], false)
+        for (i = 0; i < infos[0].length; i++) {
+            if (isNaN(infos[0][i]) && isUpperCase(infos[0][i])) {
+                addText("mp", infos[0][i], false)
+                addText("desc", infos[0][i+1], false)
+                addText("rsunim", infos[0][i+2], false)
+                addText("rsunima", infos[0][i+3], false)
+                addText("rstotal", infos[0][i+4], false)
+            }
+        }
 
         document.getElementById("data").textContent = infos[1]
-        document.getElementById("title").textContent = "Orçamento - "+localStorage.getItem("idToView")
-    
-
+        document.getElementById("title").textContent = "Orçamento - " + localStorage.getItem("idToView")
     } else {
         if (fs.existsSync(join(__dirname, "..", "..", "orcamentos.json"))) {
             let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
@@ -66,7 +72,7 @@ window.onload = async () => {
                 lastId = i
             }
             id = parseInt(lastId) + 1
-            document.getElementById("title").textContent = "Orçamento - "+id
+            document.getElementById("title").textContent = "Orçamento - " + id
         } else document.getElementById("title").textContent = "Orçamento - 0"
 
         var data = new Date().toLocaleDateString();
@@ -77,6 +83,20 @@ window.onload = async () => {
         addText("rsunim", 0)
         addText("rsunima", 0)
         addText("rstotal", 0)
+
+        if (fs.existsSync(join(__dirname, "..", "..", "temp.json"))) {
+            let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
+
+            for (i in data) {
+                addText("mp", data[i][0])
+                addText("desc", data[i][1])
+                addText("rsunim", 0)
+                addText("rsunima", 0)
+                addText("rstotal", 0)
+            }
+
+            // console.log(Array(operations).push("AA"))
+        }
 
         if (!fs.existsSync(join(__dirname, "..", "..", "orcamentos.json")))
             await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"),

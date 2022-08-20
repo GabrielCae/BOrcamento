@@ -94,33 +94,38 @@ function info(text) {
 }
 
 window.onload = async () => {
-    // document.getElementById("imgAdd").addEventListener("click", () => {
-    //     let itens = []
-    //     let operations = perform()
+    document.getElementById("imgAdd").addEventListener("click", async () => {
+        let operations = perform()
+        let data = fs.existsSync(join(__dirname, "..", "..", "temp.json")) ?
+            JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json"))) :
+            []
 
-    //     if (localStorage.getItem("itens") != null) itens.push(localStorage.getItem("itens").split(","))
-    //     localStorage.setItem("itens",
-    //         itens == [] ?
-    //             [
-    //                 localStorage.getItem("mpSelected"),
-    //                 localStorage.getItem("opt"),
-    //                 operations
-    //             ]
-    //             :
-    //             Array(itens, [
-    //                 localStorage.getItem("mpSelected"),
-    //                 localStorage.getItem("opt"),
-    //                 operations
-    //             ])
-    //     )
-    //     console.log(localStorage.getItem("itens"))
-    // })
+        data.push([localStorage.getItem("mpSelected"),
+        localStorage.getItem("opt"),
+        localStorage.getItem("qtde"),
+            operations
+        ])
+
+        ipcRenderer.send("backTo")
+
+        await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
+            JSON.stringify(data))
+    })
+
+    document.getElementById("imgNew").addEventListener("click", async () => {
+        await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
+        ipcRenderer.send("backTo")
+    })
+
     document.getElementById("imgConfirm").addEventListener("click", async () => {
-        localStorage.setItem("onlyView", false)
+        localStorage.setItem("onlyView", 0)
         ipcRenderer.send("orcamentPDF")
     })
 
-    document.getElementById("back").addEventListener("click", () => ipcRenderer.send("backOpera"))
+    document.getElementById("back").addEventListener("click", async () => {
+        await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
+        ipcRenderer.send("backOpera")
+    })
     document.getElementById("help").addEventListener("click",
         () => info("Monte uma planilha com o seguinte formato: \n\nCentro de Custo (Coluna A) - Valor (Coluna B)"))
     if (!fs.existsSync(join(__dirname, "..", "..", "cc.json"))) {
@@ -132,6 +137,8 @@ window.onload = async () => {
         let operations = perform()
 
         // MP
+        let totalMP = 0
+
         await addText("mp", localStorage.getItem("mpSelected"))
         await addText("desc", localStorage.getItem("opt"))
         let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..",
@@ -141,37 +148,42 @@ window.onload = async () => {
             .replace(".", ","))
         await addText("unid", "kg")
         await addText("qtde", String(parseFloat(localStorage.getItem("info").split(",")[1]).toFixed(4))
-            .replace(".", ","), true)
-        await addText("conj", 1, true)
-        await addText("rstotal", "R$ " + 0)
+            .replace(".", ","), false)
+        await addText("conj", 1, false)
+        totalMP = parseFloat(preco[localStorage.getItem("mpSelected")] *
+            parseFloat(localStorage.getItem("qtde")).toFixed(4)) * 1
+        await addText("rstotal", "R$ " + String(totalMP.toFixed(4)).replace(".", ","))
 
-        let totalMP = 0
+        if (fs.existsSync(join(__dirname, "..", "..", "temp.json"))) {
+            let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
 
-        setInterval(async () => {
-            let json = {}
-            if (fs.existsSync(join(__dirname, "..", "..", "config.json"))) {
-                json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
+            for (i in data) {
+                await addText("mp", data[i][0])
+                await addText("desc", data[i][1])
+                await addText("rsuni", String(parseFloat(preco[data[i][0]]).toFixed(2)).replace(".", ","))
+                await addText("unid", "kg")
+                await addText("qtde", String(parseFloat(data[i][2]).toFixed(4)).replace(".", ","), false)
+                await addText("conj", 1, false)
+                let total = parseFloat((preco[data[i][0]] * parseFloat(data[i][2]).toFixed(4)) * 1)
+                totalMP = totalMP + total
+                await addText("rstotal", "R$ " + String(total.toFixed(4)).replace(".", ","))
             }
-            document.querySelector("p.qtde").textContent = String(parseFloat(json["qtde"]).toFixed(4))
-                .replace(".", ",")
-            document.querySelector("p.conj").textContent = parseFloat(json["conj"]).toFixed(0)
+            console.log(totalMP)
 
-            totalMP = parseFloat((preco[localStorage.getItem("mpSelected")] * parseFloat(json["qtde"]).toFixed(4))
-                * parseFloat(json["conj"]).toFixed(4)).toFixed(4)
-            // console.log(totalMP)
-            document.querySelector("p.rstotal").textContent = String("R$ " + parseFloat(totalMP).toFixed(2))
-                .replace(".", ",")
-        }, 1000)
+            // console.log(Array(operations).push("AA"))
+        }
 
         // espaçamento
 
-        addBr("mp")
-        addBr("desc")
-        addBr("rsuni")
-        addBr("unid")
-        addBr("qtde")
-        addBr("conj")
-        addBr("rstotal")
+        addText("conj", "Total MP:")
+        addText("rstotal", "R$ " + String(totalMP.toFixed(4)).replace(".", ","))
+        for (i = 0; i < 1; i++) {
+            addBr("mp")
+            addBr("desc")
+            addBr("rsuni")
+            addBr("unid")
+            addBr("qtde")
+        }
 
         // OPERATIONS
 
@@ -235,7 +247,7 @@ window.onload = async () => {
             addBr("hourM")
         }
 
-        console.log(totalMP)
+        // console.log(totalMP)
         addText("taxa", "Total Geral: ")
         addText("medio", "R$ " + parseFloat(parseFloat(totalMP) + totalMedio).toFixed(2), false,
             true, "geralMedio")
