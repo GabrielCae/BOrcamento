@@ -93,6 +93,9 @@ function info(text) {
     ipcRenderer.send("showMsg", [text, "Info"])
 }
 
+let totalMedio = 0
+let totalMaximo = 0
+
 window.onload = async () => {
     document.getElementById("imgAdd").addEventListener("click", async () => {
         let operations = perform()
@@ -100,10 +103,12 @@ window.onload = async () => {
             JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json"))) :
             []
 
-        data.push([localStorage.getItem("mpSelected"),
-        localStorage.getItem("opt"),
-        localStorage.getItem("qtde"),
-            operations
+        data.push([
+            localStorage.getItem("mpSelected"),
+            localStorage.getItem("opt"),
+            localStorage.getItem("qtde"),
+            localStorage.getItem("totalMedio"),
+            localStorage.getItem("totalMaximo")
         ])
 
         ipcRenderer.send("backTo")
@@ -113,7 +118,10 @@ window.onload = async () => {
     })
 
     document.getElementById("imgNew").addEventListener("click", async () => {
-        await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
+        try {
+            await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
+        }
+        catch { }
         ipcRenderer.send("backTo")
     })
 
@@ -123,7 +131,10 @@ window.onload = async () => {
     })
 
     document.getElementById("back").addEventListener("click", async () => {
-        await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
+        try {
+            await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
+        }
+        catch { }
         ipcRenderer.send("backOpera")
     })
     document.getElementById("help").addEventListener("click",
@@ -149,29 +160,11 @@ window.onload = async () => {
         await addText("unid", "kg")
         await addText("qtde", String(parseFloat(localStorage.getItem("info").split(",")[1]).toFixed(4))
             .replace(".", ","), false)
-        await addText("conj", 1, false)
+        await addBr("conj")
+        await addBr("conj")
         totalMP = parseFloat(preco[localStorage.getItem("mpSelected")] *
             parseFloat(localStorage.getItem("qtde")).toFixed(4)) * 1
         await addText("rstotal", "R$ " + String(totalMP.toFixed(4)).replace(".", ","))
-
-        if (fs.existsSync(join(__dirname, "..", "..", "temp.json"))) {
-            let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
-
-            for (i in data) {
-                await addText("mp", data[i][0])
-                await addText("desc", data[i][1])
-                await addText("rsuni", String(parseFloat(preco[data[i][0]]).toFixed(2)).replace(".", ","))
-                await addText("unid", "kg")
-                await addText("qtde", String(parseFloat(data[i][2]).toFixed(4)).replace(".", ","), false)
-                await addText("conj", 1, false)
-                let total = parseFloat((preco[data[i][0]] * parseFloat(data[i][2]).toFixed(4)) * 1)
-                totalMP = totalMP + total
-                await addText("rstotal", "R$ " + String(total.toFixed(4)).replace(".", ","))
-            }
-            console.log(totalMP)
-
-            // console.log(Array(operations).push("AA"))
-        }
 
         // espaçamento
 
@@ -189,15 +182,13 @@ window.onload = async () => {
 
         addTitle("mp", "Operações", "opera")
         addTitle("desc", "Centro de Custos", "cc")
-        addTitle("rsuni", "Média Hora", "hour")
-        addTitle("unid", "Hora Máxima", "hourM")
-        addTitle("qtde", "Taxa Hora MOD", "taxa")
+        addTitle("unid", "Média Hora", "hour")
+        addTitle("qtde", "Hora Máxima", "hourM")
+        addTitle("rsuni", "Taxa Hora MOD", "taxa")
         addTitle("conj", "Custo Médio", "medio")
         addTitle("rstotal", "Custo Máximo", "max")
 
         // console.log(localStorage.getItem("info"))
-        let totalMedio = 0
-        let totalMaximo = 0
 
         operations = operations.sort()
         for (i in operations) {
@@ -239,7 +230,6 @@ window.onload = async () => {
         addText("max", "R$ " + String(parseFloat(totalMaximo).toFixed(2))
             .replace(".", ","))
 
-
         for (i = 0; i < 2; i++) {
             addBr("opera")
             addBr("cc")
@@ -251,8 +241,11 @@ window.onload = async () => {
         addText("taxa", "Total Geral: ")
         addText("medio", "R$ " + parseFloat(parseFloat(totalMP) + totalMedio).toFixed(2), false,
             true, "geralMedio")
+        localStorage.setItem("totalMedio", parseFloat(totalMP) + totalMedio)
         addText("max", "R$ " + parseFloat(parseFloat(totalMP) + totalMaximo).toFixed(2), false,
             true, "geralMax")
+        localStorage.setItem("totalMaximo", parseFloat(totalMP) + totalMaximo)
+
         addBr("taxa")
         addBr("medio")
         addBr("max")

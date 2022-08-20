@@ -17,7 +17,7 @@ app.on("ready", () => {
         autoHideMenuBar: true,
         show: false,
         maximizable: true,
-        // icon: join(__dirname, "assets/logoAPP.png"),
+        icon: join(__dirname, "assets/icon.png"),
         webPreferences: {
             contextIsolation: false,
             nodeIntegration: true,

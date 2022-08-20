@@ -6,6 +6,7 @@ let mp
 let name
 
 window.onload = async () => {
+    localStorage.setItem("qtde", null)
     document.getElementById("back").addEventListener("click", () => ipcRenderer.send("back"))
     document.getElementById("options").style.display = "none"
     document.getElementById("bob").style.display = "none"
@@ -28,9 +29,19 @@ window.onload = async () => {
     } catch { }
 
     document.getElementById("right").addEventListener("click", () => {
-        localStorage.setItem("mpSelected", mp)
-        localStorage.setItem("opt", name)
-        ipcRenderer.send("operations")
+        let inputs = document.querySelectorAll("input");
+        let show = false
+        inputs.forEach(i => {
+            if (i.style.display != "none") {
+                if (i.value != 0 && i.value != "") show = true
+                else show = false
+            }
+        })
+        if (show) {
+            localStorage.setItem("mpSelected", mp)
+            localStorage.setItem("opt", name)
+            ipcRenderer.send("operations")
+        } else error("Preencha todas as informações!")
     })
 
     setInterval(() => {
@@ -65,30 +76,25 @@ async function calc() {
 
     if (mp.startsWith("PET")) {
         // console.log(bob, esp, l2, cav)
-        if (bob == 0) error("A espessura das bobinas não pode ser zerada")
-        else if (esp == 0) error("A espessura não pode ser zerada")
-        else if (l2 == 0 || l1 == 0) error("Os lados da mesa não podem ser zerados")
-        else if (cav == 0) error("As cavidades não podem ser zeradas")
-        else {
+        try {
             let massa = parseFloat((bob * esp) * (parseFloat(l2) + 20) * ((0.00000137 * 0.13) + 0.00000137)).toFixed(4)
             let totalPC = parseFloat(massa / cav).toFixed(4)
 
-            document.getElementById("info").textContent = "Peso (kg): " + massa + " - Total p/ Pç: " + totalPC
+            if (!isNaN(totalPC))
+                document.getElementById("info").textContent = "Peso (kg): " + massa + " - Total p/ Pç: " + totalPC
 
             json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
 
             localStorage.setItem("qtde", totalPC)
             json["conj"] = 1
             await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(json))
-    
+
             localStorage.setItem("info", [massa, totalPC])
-        }
+        } catch { }
 
         // console.log(massa, totalPC)
     } else if (mp.startsWith("EVA")) {
-        if (esp == 0) error("A espessura não pode ser zerada")
-        else if (l2 == 0 || l1 == 0) error("Os lados da mesa não podem ser zerados")
-        else {
+        try {
             let area = parseFloat(l1 * l2 * esp)
             let kgPadrao = 356400
             let kgPadraoDec = 0.048
@@ -102,14 +108,13 @@ async function calc() {
             json["conj"] = 1
             await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(json))
 
-            document.getElementById("info").textContent = "Peso (kg): " + kgPC.toFixed(4) + " - Total p/ Pç: " + totalPC
+            if (!isNaN(totalPC))
+                document.getElementById("info").textContent = "Peso (kg): " + kgPC.toFixed(4) + " - Total p/ Pç: " + totalPC
             localStorage.setItem("info", [kgPC, totalPC])
-        }
-
+        } catch { }
         // console.log(kgPC, percakg, totalPC)
     } else if (mp.startsWith("PAPEL")) {
-        if (l2 == 0 || l1 == 0) error("Os lados da mesa não podem ser zerados")
-        else {
+        try {
             let area = l1 * l2
             let areaTotal = (area * 0.1) + area
             let pesoFolha = 0.022
@@ -122,9 +127,10 @@ async function calc() {
             json["conj"] = 1
             await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(json))
 
-            document.getElementById("info").textContent = "Área Total: " + areaTotal + " - Total p/ Pç: " + totalPC
+            if (!isNaN(totalPC))
+                document.getElementById("info").textContent = "Área Total: " + areaTotal + " - Total p/ Pç: " + totalPC
             localStorage.setItem("info", [areaTotal, totalPC])
-        }
+        } catch { }
 
         // console.log(parseFloat(totalPC).toFixed(4), medidaFolha)
     }

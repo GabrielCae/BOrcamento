@@ -55,9 +55,8 @@ window.onload = async () => {
             if (isNaN(infos[0][i]) && isUpperCase(infos[0][i])) {
                 addText("mp", infos[0][i], false)
                 addText("desc", infos[0][i+1], false)
-                addText("rsunim", infos[0][i+2], false)
-                addText("rsunima", infos[0][i+3], false)
-                addText("rstotal", infos[0][i+4], false)
+                addText("rstotalmed", parseFloat(infos[0][i+2]).toFixed(2), false)
+                addText("rstotalmax", parseFloat(infos[0][i+3]).toFixed(2), false)
             }
         }
 
@@ -80,9 +79,10 @@ window.onload = async () => {
 
         addText("mp", localStorage.getItem("mpSelected"))
         addText("desc", localStorage.getItem("opt"))
-        addText("rsunim", 0)
-        addText("rsunima", 0)
-        addText("rstotal", 0)
+        addText("rstotalmed", parseFloat(localStorage.getItem("totalMedio"))
+        .toFixed(2))
+        addText("rstotalmax", parseFloat(localStorage.getItem("totalMaximo"))
+        .toFixed(2))
 
         if (fs.existsSync(join(__dirname, "..", "..", "temp.json"))) {
             let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
@@ -90,9 +90,8 @@ window.onload = async () => {
             for (i in data) {
                 addText("mp", data[i][0])
                 addText("desc", data[i][1])
-                addText("rsunim", 0)
-                addText("rsunima", 0)
-                addText("rstotal", 0)
+                addText("rstotalmed", parseFloat(data[i][3]).toFixed(2))
+                addText("rstotalmax", parseFloat(data[i][4]).toFixed(2))
             }
 
             // console.log(Array(operations).push("AA"))
