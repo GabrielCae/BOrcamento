@@ -1,0 +1,48 @@
+.content {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+select {
+    margin-top: 15px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    display: grid;
+
+    font-size: 15px;
+    width: 250px;
+    user-select: none;
+    outline: 0;
+
+    border-radius: 8px;
+    height: 20px;
+    width: 100%;
+    margin-bottom: 20px;
+    height: 30px;
+    font-size: 20px;
+}
+
+img#back {
+    height: 25px;
+    width: 25px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+img:hover {
+    cursor: pointer;
+}
+
+h1 {
+    font-family: 'Gentium Book Plus', serif;
+    font-size: 45px;
+    font-weight: 700;
+    margin-top: 100px;
+    margin-bottom: 5px;
+}

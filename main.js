@@ -163,7 +163,26 @@ ipcMain.on("historyOrc", async () => {
         }
     })
 
+    historyOrc.loadFile(join(__dirname, "Screens", "historyOrc", "index.html"))
+})
 
+ipcMain.on("loadOrcament", () => {
+    if (valueChangeWin == undefined) {
+        valueChangeWin = new BrowserWindow({
+            width: 1080,
+            height: 720,
+            center: true,
+            autoHideMenuBar: true,
+            show: true,
+            webPreferences: {
+                contextIsolation: false,
+                nodeIntegration: true,
+            }
+        })
+        valueChangeWin.on("close", () => valueChangeWin = undefined)
+    } else valueChangeWin.focus()
+
+    valueChangeWin.loadFile(join(__dirname, "Screens", "orcamentPDF", "index.html"))
 })
 
 ipcMain.on("report", () => {

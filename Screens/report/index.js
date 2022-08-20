@@ -116,15 +116,8 @@ window.onload = async () => {
     //     console.log(localStorage.getItem("itens"))
     // })
     document.getElementById("imgConfirm").addEventListener("click", async () => {
-        if (fs.existsSync(join(__dirname, "..", "..", "orcamentos.json"))) {
-            let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
-            console.log()
-        } else {
-            await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"),
-            JSON.stringify({0: "teste", 1: "test"}))
-        }
-
-        // ipcRenderer.send("orcamentPDF")
+        localStorage.setItem("onlyView", false)
+        ipcRenderer.send("orcamentPDF")
     })
 
     document.getElementById("back").addEventListener("click", () => ipcRenderer.send("backOpera"))
