@@ -54,6 +54,8 @@ window.onload = async () => {
         document.querySelector("div.btn").style.left = "25px"
         document.getElementById("help").style.marginLeft = "90px"
 
+        console.log(join(__dirname, "..", "..", "operacoes.json"))
+
         let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "operacoes.json")))
         console.log(data)
 
@@ -73,9 +75,12 @@ window.onload = async () => {
         }
     } else {
         let info = document.createElement("p")
+        document.querySelector("div.table-responsive").style.display = "none"
         document.getElementById("import").style.display = "flex"
+        document.getElementById("import").style.minWidth = "300px"
         document.getElementById("help").style.display = "flex"
-        document.getElementById("title").style.display = "none"
+        document.getElementById("title").style.display = "flex"
+        document.getElementById("title").textContent = "Importe as operações"
         info.textContent = "Nenhuma operação importada"
 
         document.getElementById("tabela").appendChild(info)

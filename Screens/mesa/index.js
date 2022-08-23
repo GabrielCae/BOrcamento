@@ -83,7 +83,9 @@ async function calc() {
             if (!isNaN(totalPC))
                 document.getElementById("info").textContent = "Peso (kg): " + massa + " - Total p/ Pç: " + totalPC
 
-            json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
+            json = await fs.existsSync(join(__dirname, "..", "..", "config.json")) ?
+                await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json"))) :
+                {}
 
             localStorage.setItem("qtde", totalPC)
             json["conj"] = 1
@@ -102,7 +104,9 @@ async function calc() {
             let percakg = parseFloat(kgPC * 0.2)
             let totalPC = parseFloat(kgPC + percakg).toFixed(4)
 
-            json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
+            json = await fs.existsSync(join(__dirname, "..", "..", "config.json")) ?
+                await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json"))) :
+                {}
 
             localStorage.setItem("qtde", totalPC)
             json["conj"] = 1
@@ -111,7 +115,7 @@ async function calc() {
             if (!isNaN(totalPC))
                 document.getElementById("info").textContent = "Peso (kg): " + kgPC.toFixed(4) + " - Total p/ Pç: " + totalPC
             localStorage.setItem("info", [kgPC, totalPC])
-        } catch { }
+        } catch (err) { console.log(err) }
         // console.log(kgPC, percakg, totalPC)
     } else if (mp.startsWith("PAPEL")) {
         try {
@@ -121,7 +125,9 @@ async function calc() {
             let medidaFolha = 445 * 635
             let totalPC = parseFloat((areaTotal * pesoFolha) / medidaFolha).toFixed(4)
 
-            json = await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
+            json = await fs.existsSync(join(__dirname, "..", "..", "config.json")) ?
+                await JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json"))) :
+                {}
 
             localStorage.setItem("qtde", totalPC)
             json["conj"] = 1

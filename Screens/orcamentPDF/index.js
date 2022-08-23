@@ -47,6 +47,9 @@ window.onload = async () => {
         console.log("AAA")
         let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
         let infos = []
+        let totalMedio = 0
+        let totalMaximo = 0
+        
         for (i in data) {
             if (i == localStorage.getItem("idToView")) infos = data[i]
         }
@@ -54,11 +57,24 @@ window.onload = async () => {
         for (i = 0; i < infos[0].length; i++) {
             if (isNaN(infos[0][i]) && isUpperCase(infos[0][i])) {
                 addText("mp", infos[0][i], false)
-                addText("desc", infos[0][i+1], false)
-                addText("rstotalmed", parseFloat(infos[0][i+2]).toFixed(2), false)
-                addText("rstotalmax", parseFloat(infos[0][i+3]).toFixed(2), false)
+                addText("desc", infos[0][i + 1], false)
+                addText("rstotalmed", parseFloat(infos[0][i + 2]).toFixed(2), false)
+                totalMedio += parseFloat(infos[0][i + 2])
+                addText("rstotalmax", parseFloat(infos[0][i + 3]).toFixed(2), false)
+                totalMaximo += parseFloat(infos[0][i + 3])
             }
         }
+
+        addBr("rstotalmed")
+        addBr("rstotalmax")
+        addBr("desc")
+        for (i = 0; i < 2; i++) {
+            addBr("mp")
+        }
+
+        addText("desc", "Total: ", false)
+        addText("rstotalmed", "R$ "+totalMedio.toFixed(2), false)
+        addText("rstotalmax", "R$ "+totalMaximo.toFixed(2), false)
 
         document.getElementById("data").textContent = infos[1]
         document.getElementById("title").textContent = "Orçamento - " + localStorage.getItem("idToView")
@@ -76,13 +92,17 @@ window.onload = async () => {
 
         var data = new Date().toLocaleDateString();
         document.getElementById("data").textContent = data
+        let totalMedio = 0
+        let totalMaximo = 0
 
         addText("mp", localStorage.getItem("mpSelected"))
         addText("desc", localStorage.getItem("opt"))
         addText("rstotalmed", parseFloat(localStorage.getItem("totalMedio"))
-        .toFixed(2))
+            .toFixed(2))
+        totalMedio += parseFloat(localStorage.getItem("totalMedio"))
         addText("rstotalmax", parseFloat(localStorage.getItem("totalMaximo"))
-        .toFixed(2))
+            .toFixed(2))
+        totalMaximo += parseFloat(localStorage.getItem("totalMaximo"))
 
         if (fs.existsSync(join(__dirname, "..", "..", "temp.json"))) {
             let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
@@ -91,12 +111,25 @@ window.onload = async () => {
                 addText("mp", data[i][0])
                 addText("desc", data[i][1])
                 addText("rstotalmed", parseFloat(data[i][3]).toFixed(2))
+                totalMedio += parseFloat(data[i][3])
                 addText("rstotalmax", parseFloat(data[i][4]).toFixed(2))
+                totalMaximo += parseFloat(data[i][4])
             }
 
             // console.log(Array(operations).push("AA"))
         }
 
+        console.log(totalMedio, totalMaximo)
+        addBr("rstotalmed")
+        addBr("rstotalmax")
+        addBr("desc")
+        for (i = 0; i < 2; i++) {
+            addBr("mp")
+        }
+
+        addText("desc", "Total: ", false)
+        addText("rstotalmed", "R$ "+totalMedio.toFixed(2), false)
+        addText("rstotalmax", "R$ "+totalMaximo.toFixed(2), false)
         if (!fs.existsSync(join(__dirname, "..", "..", "orcamentos.json")))
             await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"),
                 JSON.stringify({}))
