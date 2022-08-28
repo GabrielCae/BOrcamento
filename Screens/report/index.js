@@ -164,12 +164,12 @@ window.onload = async () => {
         await addBr("conj")
         totalMP = parseFloat(preco[localStorage.getItem("mpSelected")] *
             parseFloat(localStorage.getItem("qtde")).toFixed(4)) * 1
-        await addText("rstotal", "R$ " + String(totalMP.toFixed(4)).replace(".", ","))
+        await addText("rstotal", "R$ " + String(totalMP.toFixed(2)).replace(".", ","))
 
         // espaçamento
 
         addText("conj", "Total MP:")
-        addText("rstotal", "R$ " + String(totalMP.toFixed(4)).replace(".", ","))
+        addText("rstotal", "R$ " + String(totalMP.toFixed(2)).replace(".", ","))
         for (i = 0; i < 1; i++) {
             addBr("mp")
             addBr("desc")

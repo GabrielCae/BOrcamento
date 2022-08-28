@@ -1,3 +1,4 @@
+const { ipcRenderer } = require('electron')
 const fs = require('fs')
 const { join } = require('path')
 
@@ -42,9 +43,24 @@ function isUpperCase(str) {
     return String(str) === String(str).toUpperCase();
 }
 
+function generatePDF() {
+    ipcRenderer.send("searchPDF")
+}
+
+ipcRenderer.on("hideContent", (event, arg) => {
+    if (arg != undefined) {
+        document.getElementById("pdf").style.display = "none"
+
+        ipcRenderer.send("emitPDF", arg)
+    }
+})
+
+ipcRenderer.on("showContent", () => {
+    document.getElementById("pdf").style.display = "grid"
+})
+
 window.onload = async () => {
     if (localStorage.getItem("onlyView") == 1) {
-        console.log("AAA")
         let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
         let infos = []
         let totalMedio = 0
@@ -54,14 +70,17 @@ window.onload = async () => {
             if (i == localStorage.getItem("idToView")) infos = data[i]
         }
 
+        console.log(infos)
+
         for (i = 0; i < infos[0].length; i++) {
-            if (isNaN(infos[0][i]) && isUpperCase(infos[0][i])) {
+            if ((isNaN(infos[0][i]) && !String(infos[0][i]).startsWith("R$")) && 
+            isUpperCase(infos[0][i])) {
                 addText("mp", infos[0][i], false)
                 addText("desc", infos[0][i + 1], false)
-                addText("rstotalmed", parseFloat(infos[0][i + 2]).toFixed(2), false)
-                totalMedio += parseFloat(infos[0][i + 2])
-                addText("rstotalmax", parseFloat(infos[0][i + 3]).toFixed(2), false)
-                totalMaximo += parseFloat(infos[0][i + 3])
+                addText("rstotalmed", infos[0][i + 2], false)
+                totalMedio += parseFloat(String(infos[0][i + 2]).replace("R$ ", ""))
+                addText("rstotalmax", infos[0][i + 3], false)
+                totalMaximo += parseFloat(String(infos[0][i + 3]).replace("R$ ", ""))
             }
         }
 
@@ -97,10 +116,10 @@ window.onload = async () => {
 
         addText("mp", localStorage.getItem("mpSelected"))
         addText("desc", localStorage.getItem("opt"))
-        addText("rstotalmed", parseFloat(localStorage.getItem("totalMedio"))
+        addText("rstotalmed", "R$ "+parseFloat(localStorage.getItem("totalMedio"))
             .toFixed(2))
         totalMedio += parseFloat(localStorage.getItem("totalMedio"))
-        addText("rstotalmax", parseFloat(localStorage.getItem("totalMaximo"))
+        addText("rstotalmax", "R$ "+parseFloat(localStorage.getItem("totalMaximo"))
             .toFixed(2))
         totalMaximo += parseFloat(localStorage.getItem("totalMaximo"))
 
@@ -110,16 +129,16 @@ window.onload = async () => {
             for (i in data) {
                 addText("mp", data[i][0])
                 addText("desc", data[i][1])
-                addText("rstotalmed", parseFloat(data[i][3]).toFixed(2))
+                addText("rstotalmed", "R$ "+parseFloat(data[i][3]).toFixed(2))
                 totalMedio += parseFloat(data[i][3])
-                addText("rstotalmax", parseFloat(data[i][4]).toFixed(2))
+                addText("rstotalmax", "R$ "+parseFloat(data[i][4]).toFixed(2))
                 totalMaximo += parseFloat(data[i][4])
             }
 
             // console.log(Array(operations).push("AA"))
         }
 
-        console.log(totalMedio, totalMaximo)
+        // console.log(totalMedio, totalMaximo)
         addBr("rstotalmed")
         addBr("rstotalmax")
         addBr("desc")

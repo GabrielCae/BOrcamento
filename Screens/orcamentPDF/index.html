@@ -13,17 +13,19 @@
 <body>
     <div class="titles">
         <div class="termedic">
-            <img src="../../assets/termedic.png" alt="certified">
-            <p>Ajapi, Rio Claro</p>
-            <h3 id="title">Orçamento - ID</h1>
+            <img src="../../assets/termedic.png" id="termedicImg" alt="certified">
+            <p id="pT">Ajapi, Rio Claro</p>
         </div>
         <div class="certified">
-            <img src="../../assets/certified.png" alt="certified">
-            <p id="data">Data</p>
+            <img src="../../assets/certified.png" id="sintegraImg" alt="certified">
             <h3>Sintegra Sciencies</h1>
+                <p id="data">Data</p>
         </div>
     </div>
+
     <div class="table-responsive">
+        <h3 id="title">Orçamento - ID</h3>
+
         <!-- <img src="../../assets/arrow.png" alt="arrow" id="back"> -->
 
         <table class="table">
@@ -44,6 +46,9 @@
                 </tr>
             </thead>
         </table>
+
+        <button type="button" onclick="generatePDF()" id="pdf">Gerar PDF</button>
+
     </div>
 
 </body>

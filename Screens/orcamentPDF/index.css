@@ -21,7 +21,48 @@ body {
     text-align: center;
 }
 
+button {
+    background-color: #646162;
+
+    border-color: transparent;
+    border-radius: 8px;
+    height: 40px;
+    user-select: none;
+    outline: 0;
+    width: 100%;
+    margin-top: 100px;
+
+    font-family: 'Gentium Book Plus', serif;
+    font-size: 25px;
+    font-weight: 400;
+
+    transition: opacity 0.9s;
+    color: #FFFFFF;
+}
+
+h3 {
+    text-align: center;
+}
+
+button:hover {
+    cursor: pointer;
+    opacity: 90%;
+}
+
+.termedic {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+}
+
+.certified {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+}
+
 .termedic img {
+    margin-left: 20px;
     margin-bottom: 13px;
     align-items: center;
     justify-content: center;
@@ -96,6 +137,7 @@ p {
 }
 
 .table-responsive {
+    margin-top: 100px;
     display: grid;
     width: 100% !important;
 }

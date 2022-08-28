@@ -5,6 +5,7 @@ const {
     dialog
 } = require('electron')
 const { join, basename } = require('path')
+const fs = require("fs")
 
 let mainWin
 let valueChangeWin
@@ -149,6 +150,37 @@ ipcMain.on("importar", async (event, arg) => {
     else if (arg == "report") event.reply("reportData", path)
 })
 
+ipcMain.on("searchPDF", async (event, arg) => {
+    let result = await dialog.showSaveDialogSync({
+        properties: ["createDirectory"], filters: [
+            { name: 'PDF', extensions: ['pdf'] },
+        ]
+    })
+    while (String(result).includes("\\")) result = String(result).replace("\\", "/")
+
+    event.reply("hideContent", result)
+})
+
+ipcMain.on("emitPDF", (event, arg) => {
+    var options = {
+        marginsType: 1,
+        pageSize: {
+            "width": 507993.6,
+            "height": 285800.4
+        },
+        printBackground: true,
+        printSelectionOnly: false,
+        landscape: false
+    }
+
+    valueChangeWin.webContents.printToPDF(options).then(async data => {
+        await fs.writeFileSync(arg, data)
+    }).catch(error => {
+        console.log(error)
+    });
+    event.reply("showContent")
+})
+
 let historyOrc
 ipcMain.on("historyOrc", async () => {
     historyOrc = new BrowserWindow({
@@ -162,6 +194,7 @@ ipcMain.on("historyOrc", async () => {
             nodeIntegration: true,
         }
     })
+    historyOrc.on("close", () => historyOrc = undefined)
 
     historyOrc.loadFile(join(__dirname, "Screens", "historyOrc", "index.html"))
 })
