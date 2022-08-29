@@ -27,8 +27,8 @@ app.on("ready", () => {
     })
 
     // mainWin.focus()
-    mainWin.once("ready-to-show", () => mainWin.show())
     mainWin.loadFile(join(__dirname, "Screens", "main", "index.html"))
+    mainWin.once("ready-to-show", () => mainWin.show())
 })
 
 ipcMain.on("newOrc", () => {
@@ -220,6 +220,10 @@ ipcMain.on("loadOrcament", () => {
 
 ipcMain.on("report", () => {
     mainWin.loadFile(join(__dirname, "Screens", "report", "index.html"))
+})
+
+ipcMain.on("markupScreen", () => {
+    mainWin.loadFile(join(__dirname, "Screens", "markup", "index.html"))
 })
 
 ipcMain.on("back", () => {

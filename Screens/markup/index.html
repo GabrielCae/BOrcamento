@@ -12,7 +12,41 @@
 
 <body>
     <img src="../../assets/arrow.png" alt="arrow" id="back">
-    <h1 id="title">Orçamento</h1>
+    <h1 id="title">Markup</h1>
+
+    <div class="inputs">
+        <label for="pis">PIS/COFINS (%)</label>
+        <input type="number" id="pis">
+
+        <label for="ir">IR (%)</label>
+        <input type="number" id="ir">
+
+        <label for="icms">ICMS (%)</label>
+        <input type="number" id="icms">
+
+        <label for="icms">IPI (%)</label>
+        <input type="number" id="ipi"><br>
+
+        <label for="icms">MARGEM DE CONTRIBUIÇÃO (%)</label>
+        <input type="number" id="mc">
+
+        <!-- <p id="pv"></p> -->
+    </div>
+
+    <p id="markup"></p>
+    <div class="custos">
+        <div class="custoMeee">
+            <p id="custoMe"></p>
+            <p id="custoMeMark"></p>
+        </div>
+
+        <div class="custoMaxx">
+            <p id="custoMax"></p>
+            <p id="custoMaxMark"></p>
+        </div>
+    </div>
+
+
     <div class="table-responsive">
         <table class="table">
             <thead>
@@ -51,7 +85,9 @@
     </div>
 
     <div class="options">
-        <img src="../../assets/arrow-right.png" alt="confirm" id="continue">
+        <img src="../../assets/confirm.png" alt="confirm" id="imgConfirm">
+        <img src="../../assets/box.png" alt="add" id="imgAdd">
+        <img src="../../assets/add.png" alt="add" id="imgNew">
     </div>
 
 </body>

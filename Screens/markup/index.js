@@ -93,18 +93,92 @@ function info(text) {
     ipcRenderer.send("showMsg", [text, "Info"])
 }
 
+function calc() {
+    let markup = 1 - (parseFloat(document.getElementById("pis").value) / 100 +
+        parseFloat(document.getElementById("ir").value) / 100 +
+        parseFloat(document.getElementById("icms").value) / 100 + parseFloat(document.getElementById("mc").value) / 100)
+
+    console.log(markup)
+
+    // if (markup < 0) markup *= -1
+
+    let pvMax = parseFloat(localStorage.getItem("totalMaximo")/markup).toFixed(2)
+    let pvMin = parseFloat(localStorage.getItem("totalMedio")/markup).toFixed(2)
+
+    localStorage.setItem("pvMax", pvMax)
+    localStorage.setItem("pvMin", pvMin)
+
+    document.getElementById("custoMeMark").textContent = "Preço Mínimo: R$ " + pvMin
+    document.getElementById("custoMaxMark").textContent = "Preço Máximo: R$ " + pvMax
+    document.getElementById("markup").textContent = "Markup: " + markup.toFixed(4)
+}
+
 let totalMedio = 0
 let totalMaximo = 0
 
 window.onload = async () => {
-    document.getElementById("continue").addEventListener("click", () => ipcRenderer.send("markupScreen"))
+
+    document.getElementById("custoMe").textContent = "Custo Médio: R$ " + parseFloat(localStorage.getItem("totalMedio")).toFixed(2)
+    document.getElementById("custoMax").textContent = "Custo Máximo: R$ " + parseFloat(localStorage.getItem("totalMaximo")).toFixed(2)
+
+    setInterval(() => {
+
+        let inputs = document.querySelectorAll("input");
+        let show = false
+        inputs.forEach(i => {
+            // console.log(i.value)
+            if (i.value != 0 && i.value != "") show = true
+            else show = false
+        })
+        if (show) calc()
+        else {
+            document.getElementById("custoMeMark").textContent = ""
+            document.getElementById("custoMaxMark").textContent = ""
+            document.getElementById("markup").textContent = ""
+        }
+
+    }, 500);
+
+    document.getElementById("imgAdd").addEventListener("click", async () => {
+        let operations = perform()
+        let data = fs.existsSync(join(__dirname, "..", "..", "temp.json")) ?
+            JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json"))) :
+            []
+
+        data.push([
+            localStorage.getItem("mpSelected"),
+            localStorage.getItem("opt"),
+            localStorage.getItem("qtde"),
+            localStorage.getItem("pvMin"),
+            localStorage.getItem("pvMax")
+        ])
+
+        ipcRenderer.send("backTo")
+
+        await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
+            JSON.stringify(data))
+    })
+
+    document.getElementById("imgNew").addEventListener("click", async () => {
+        try {
+            await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
+        }
+        catch { }
+        ipcRenderer.send("backTo")
+    })
+
+    document.getElementById("imgConfirm").addEventListener("click", async () => {
+        localStorage.setItem("ipi", document.getElementById("ipi").value)
+        localStorage.setItem("onlyView", 0)
+        ipcRenderer.send("orcamentPDF")
+    })
 
     document.getElementById("back").addEventListener("click", async () => {
         try {
             await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
         }
         catch { }
-        ipcRenderer.send("backOpera")
+        ipcRenderer.send("report")
     })
     document.getElementById("help").addEventListener("click",
         () => info("Monte uma planilha com o seguinte formato: \n\nCentro de Custo (Coluna A) - Valor (Coluna B)"))

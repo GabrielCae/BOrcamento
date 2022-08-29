@@ -70,6 +70,7 @@ async function actualizeMPValue() {
             await fs.writeFileSync(path, JSON.stringify(preco))
 
             select.value = ""
+            document.getElementById("actualValue").textContent = ""
             newValueInput.value = null
 
         } else error("O valor não pode ser 0")

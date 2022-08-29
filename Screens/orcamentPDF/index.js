@@ -65,7 +65,7 @@ window.onload = async () => {
         let infos = []
         let totalMedio = 0
         let totalMaximo = 0
-        
+
         for (i in data) {
             if (i == localStorage.getItem("idToView")) infos = data[i]
         }
@@ -73,8 +73,9 @@ window.onload = async () => {
         console.log(infos)
 
         for (i = 0; i < infos[0].length; i++) {
-            if ((isNaN(infos[0][i]) && !String(infos[0][i]).startsWith("R$")) && 
-            isUpperCase(infos[0][i])) {
+            if ((isNaN(infos[0][i]) && !String(infos[0][i]).startsWith("R$")
+            && !String(infos[0][i]).startsWith("IPI")) &&
+                isUpperCase(infos[0][i])) {
                 addText("mp", infos[0][i], false)
                 addText("desc", infos[0][i + 1], false)
                 addText("rstotalmed", infos[0][i + 2], false)
@@ -92,8 +93,8 @@ window.onload = async () => {
         }
 
         addText("desc", "Total: ", false)
-        addText("rstotalmed", "R$ "+totalMedio.toFixed(2), false)
-        addText("rstotalmax", "R$ "+totalMaximo.toFixed(2), false)
+        addText("rstotalmed", "R$ " + totalMedio.toFixed(2), false)
+        addText("rstotalmax", "R$ " + totalMaximo.toFixed(2), false)
 
         document.getElementById("data").textContent = infos[1]
         document.getElementById("title").textContent = "Orçamento - " + localStorage.getItem("idToView")
@@ -116,12 +117,12 @@ window.onload = async () => {
 
         addText("mp", localStorage.getItem("mpSelected"))
         addText("desc", localStorage.getItem("opt"))
-        addText("rstotalmed", "R$ "+parseFloat(localStorage.getItem("totalMedio"))
+        addText("rstotalmed", "R$ " + parseFloat(localStorage.getItem("pvMin"))
             .toFixed(2))
-        totalMedio += parseFloat(localStorage.getItem("totalMedio"))
-        addText("rstotalmax", "R$ "+parseFloat(localStorage.getItem("totalMaximo"))
+        totalMedio += parseFloat(localStorage.getItem("pvMin"))
+        addText("rstotalmax", "R$ " + parseFloat(localStorage.getItem("pvMax"))
             .toFixed(2))
-        totalMaximo += parseFloat(localStorage.getItem("totalMaximo"))
+        totalMaximo += parseFloat(localStorage.getItem("pvMax"))
 
         if (fs.existsSync(join(__dirname, "..", "..", "temp.json"))) {
             let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
@@ -129,9 +130,9 @@ window.onload = async () => {
             for (i in data) {
                 addText("mp", data[i][0])
                 addText("desc", data[i][1])
-                addText("rstotalmed", "R$ "+parseFloat(data[i][3]).toFixed(2))
+                addText("rstotalmed", "R$ " + parseFloat(data[i][3]).toFixed(2))
                 totalMedio += parseFloat(data[i][3])
-                addText("rstotalmax", "R$ "+parseFloat(data[i][4]).toFixed(2))
+                addText("rstotalmax", "R$ " + parseFloat(data[i][4]).toFixed(2))
                 totalMaximo += parseFloat(data[i][4])
             }
 
@@ -146,16 +147,24 @@ window.onload = async () => {
             addBr("mp")
         }
 
+        let ipi = parseFloat(localStorage.getItem("ipi"))/100
+
+        addText("mp", "---")
+        addText("desc", "IPI")
+        addText("rstotalmed", "R$ "+(ipi*totalMedio).toFixed(2))
+        addText("rstotalmax", "R$ "+(ipi*totalMaximo).toFixed(2))
+
         addText("desc", "Total: ", false)
-        addText("rstotalmed", "R$ "+totalMedio.toFixed(2), false)
-        addText("rstotalmax", "R$ "+totalMaximo.toFixed(2), false)
+
+        addText("rstotalmed", "R$ " + ((ipi*totalMedio)+totalMedio).toFixed(2), false)
+        addText("rstotalmax", "R$ " + ((ipi*totalMaximo)+totalMaximo).toFixed(2), false)
         if (!fs.existsSync(join(__dirname, "..", "..", "orcamentos.json")))
             await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"),
                 JSON.stringify({}))
 
         let json = await
             JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
-        json[id] = [orcament, data]
+        json[id] = [orcament, data, localStorage.getItem("ipi")]
         await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"), JSON.stringify(json))
     }
 
