@@ -28,8 +28,8 @@ async function tempo(opera, nmax, dec = false) {
     }
 }
 
-function perform() {
-    return localStorage.getItem("operations").split(",")
+function perform(info = "operations") {
+    return localStorage.getItem(info).split(",")
 }
 
 async function addText(id, text, mod = false, personalizedClass = false, classP = "") {
@@ -102,8 +102,8 @@ function calc() {
 
     // if (markup < 0) markup *= -1
 
-    let pvMax = parseFloat(localStorage.getItem("totalMaximo")/markup).toFixed(2)
-    let pvMin = parseFloat(localStorage.getItem("totalMedio")/markup).toFixed(2)
+    let pvMax = parseFloat(localStorage.getItem("totalMaximo") / markup).toFixed(2)
+    let pvMin = parseFloat(localStorage.getItem("totalMedio") / markup).toFixed(2)
 
     localStorage.setItem("pvMax", pvMax)
     localStorage.setItem("pvMin", pvMin)
@@ -117,6 +117,16 @@ let totalMedio = 0
 let totalMaximo = 0
 
 window.onload = async () => {
+
+    if (fs.existsSync(join(__dirname, "..", "..", "impostos.json"))) {
+        let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "impostos.json")))
+
+        document.getElementById("pis").value = data["pis"]
+        document.getElementById("ir").value = data["ir"]
+        document.getElementById("icms").value = data["icms"]
+        document.getElementById("mc").value = data["mc"]
+        document.getElementById("ipi").value = data["ipi"]
+    }
 
     document.getElementById("custoMe").textContent = "Custo Médio: R$ " + parseFloat(localStorage.getItem("totalMedio")).toFixed(2)
     document.getElementById("custoMax").textContent = "Custo Máximo: R$ " + parseFloat(localStorage.getItem("totalMaximo")).toFixed(2)
@@ -140,6 +150,14 @@ window.onload = async () => {
     }, 500);
 
     document.getElementById("imgAdd").addEventListener("click", async () => {
+        if (localStorage.getItem("editItem") == 1) {
+            let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
+            data.splice(data[localStorage.getItem("editId")], 1)
+
+            localStorage.setItem("editItem", 0)
+            await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"), JSON.stringify(data))
+        }
+
         let operations = perform()
         let data = fs.existsSync(join(__dirname, "..", "..", "temp.json")) ?
             JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json"))) :
@@ -150,10 +168,21 @@ window.onload = async () => {
             localStorage.getItem("opt"),
             localStorage.getItem("qtde"),
             localStorage.getItem("pvMin"),
-            localStorage.getItem("pvMax")
+            localStorage.getItem("pvMax"),
+            operations,
+            perform("infos")
         ])
 
-        ipcRenderer.send("backTo")
+        let json = {
+            pis: parseFloat(document.getElementById("pis").value),
+            ir: parseFloat(document.getElementById("ir").value),
+            icms: parseFloat(document.getElementById("icms").value),
+            mc: parseFloat(document.getElementById("mc").value),
+            ipi: parseFloat(document.getElementById("ipi").value)
+        }
+        await fs.writeFileSync(join(__dirname, "..", "..", "impostos.json"), JSON.stringify(json))
+
+        ipcRenderer.send("openShop")
 
         await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
             JSON.stringify(data))

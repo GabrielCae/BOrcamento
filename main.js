@@ -1,14 +1,21 @@
+// --- Imports ---
 const {
     app,
     BrowserWindow,
     ipcMain,
-    dialog
+    dialog,
+    ipcRenderer,
 } = require('electron')
 const { join, basename } = require('path')
 const fs = require("fs")
 
+// --- Screens Variables ---
 let mainWin
 let valueChangeWin
+let historyOrc
+let shopping
+
+// --- Main Application ---
 
 app.on("ready", () => {
     mainWin = new BrowserWindow({
@@ -31,6 +38,7 @@ app.on("ready", () => {
     mainWin.once("ready-to-show", () => mainWin.show())
 })
 
+// --- Ipc Events ---
 ipcMain.on("newOrc", () => {
     mainWin.loadFile(join(__dirname, "Screens", "EorT", "index.html"))
 })
@@ -41,6 +49,31 @@ ipcMain.on("termeOrc", () => {
 
 ipcMain.on("close", () => valueChangeWin.close())
 
+ipcMain.on("openShop", (event, arg) => {
+
+    if (shopping == undefined) {
+        shopping = new BrowserWindow({
+            width: 1080,
+            height: 720,
+            center: true,
+            autoHideMenuBar: true,
+            show: true,
+            icon: join(__dirname, "assets/icon.png"),
+            webPreferences: {
+                contextIsolation: false,
+                nodeIntegration: true,
+            }
+        })
+
+        shopping.on("close", () => shopping = null)
+
+    } else shopping.focus()
+    shopping.loadFile(join(__dirname, "Screens", "shopping", "index.html"))
+
+    mainWin.loadFile(join(__dirname, "Screens", "mesa", "index.html"))
+
+})
+
 ipcMain.on("modifyInfo", (event, arg) => {
     if (valueChangeWin == undefined) {
         valueChangeWin = new BrowserWindow({
@@ -49,6 +82,7 @@ ipcMain.on("modifyInfo", (event, arg) => {
             center: true,
             autoHideMenuBar: true,
             show: true,
+            icon: join(__dirname, "assets/icon.png"),
             webPreferences: {
                 contextIsolation: false,
                 nodeIntegration: true,
@@ -63,6 +97,7 @@ ipcMain.on("modifyInfo", (event, arg) => {
             center: true,
             autoHideMenuBar: true,
             show: true,
+            icon: join(__dirname, "assets/icon.png"),
             webPreferences: {
                 contextIsolation: false,
                 nodeIntegration: true,
@@ -74,6 +109,12 @@ ipcMain.on("modifyInfo", (event, arg) => {
 
 ipcMain.on("backOpera", () => {
     mainWin.loadFile(join(__dirname, "Screens", "opera", "index.html"))
+})
+
+ipcMain.on("closeShop", () => {
+    shopping.close()
+    shopping = undefined
+    mainWin.focus()
 })
 
 ipcMain.on("embamOrc", () => {
@@ -99,6 +140,7 @@ ipcMain.on("orcamentPDF", async () => {
             height: 720,
             center: true,
             autoHideMenuBar: true,
+            icon: join(__dirname, "assets/icon.png"),
             show: true,
             webPreferences: {
                 contextIsolation: false,
@@ -117,6 +159,7 @@ ipcMain.on("importInfo", async () => {
             width: 1080,
             height: 720,
             center: true,
+            icon: join(__dirname, "assets/icon.png"),
             autoHideMenuBar: true,
             show: true,
             webPreferences: {
@@ -181,13 +224,13 @@ ipcMain.on("emitPDF", (event, arg) => {
     event.reply("showContent")
 })
 
-let historyOrc
 ipcMain.on("historyOrc", async () => {
     historyOrc = new BrowserWindow({
         width: 1080,
         height: 720,
         center: true,
         autoHideMenuBar: true,
+        icon: join(__dirname, "assets/icon.png"),
         show: true,
         webPreferences: {
             contextIsolation: false,
@@ -205,6 +248,7 @@ ipcMain.on("loadOrcament", () => {
             width: 1080,
             height: 720,
             center: true,
+            icon: join(__dirname, "assets/icon.png"),
             autoHideMenuBar: true,
             show: true,
             webPreferences: {
@@ -235,6 +279,7 @@ ipcMain.on("backMain", () => {
 })
 
 ipcMain.on("backTo", () => {
+    mainWin.focus()
     mainWin.loadFile(join(__dirname, "Screens", "mesa", "index.html"))
 })
 

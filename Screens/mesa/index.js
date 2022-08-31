@@ -28,18 +28,65 @@ window.onload = async () => {
         }
     } catch { }
 
+    console.log(localStorage.getItem("editItem"))
+
+    if (localStorage.getItem("editItem") == 1) {
+        let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
+        data = data[localStorage.getItem("editId")]
+
+        let select = document.getElementById("materials")
+        let options = [...select.options]
+        let i = 0
+        options.forEach((option) => {
+            if (option.value == data[0]) {
+                select.selectedIndex = i
+                showOpts()
+            }
+            i++
+        })
+
+        select = document.getElementById("options")
+        options = [...select.options]
+        i = 0
+        options.forEach((option) => {
+            if (option.value == data[1]) select.selectedIndex = i
+            i++
+        })
+        name = data[1]
+
+        adjustInputs()
+        let inputs = document.querySelectorAll("input");
+        let values = []
+        for (j in data[6]) {
+            values.push(data[6][j])
+        }
+        i = 0
+        inputs.forEach(input => {
+            console.log(i)
+            if (input.style.display != "none") {
+                input.value = values[i]
+                i++
+            }
+        })
+    }
+
     document.getElementById("right").addEventListener("click", () => {
         let inputs = document.querySelectorAll("input");
         let show = false
+        let infos = []
         inputs.forEach(i => {
             if (i.style.display != "none") {
-                if (i.value != 0 && i.value != "") show = true
+                if (i.value != 0 && i.value != "") {
+                    show = true
+                    infos.push(i.value)
+                }
                 else show = false
             }
         })
         if (show) {
             localStorage.setItem("mpSelected", mp)
             localStorage.setItem("opt", name)
+            localStorage.setItem("infos", infos)
             ipcRenderer.send("operations")
         } else error("Preencha todas as informações!")
     })
@@ -49,7 +96,9 @@ window.onload = async () => {
         let show = false
         inputs.forEach(i => {
             if (i.style.display != "none") {
-                if (i.value != 0 && i.value != "") show = true
+                if (i.value != 0 && i.value != "") {
+                    show = true
+                }
                 else show = false
             }
         })

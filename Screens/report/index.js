@@ -124,7 +124,7 @@ window.onload = async () => {
         let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..",
             localStorage.getItem("empresa") == "EMBAMED" ?
                 "mpEmb.json" : "mpTerm.json")))
-        await addText("rsuni", String(parseFloat(preco[localStorage.getItem("mpSelected")]).toFixed(2))
+        await addText("rsuni", String("R$ "+parseFloat(preco[localStorage.getItem("mpSelected")]).toFixed(2))
             .replace(".", ","))
         await addText("unid", "kg")
         await addText("qtde", String(parseFloat(localStorage.getItem("info").split(",")[1]).toFixed(4))

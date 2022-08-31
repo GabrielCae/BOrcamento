@@ -1,0 +1,190 @@
+body {
+    -webkit-display: grid;
+    display: grid;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+}
+
+.titles {
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.termedic, .certified {
+    justify-content: center;
+    display: grid;
+    align-items: center;
+    text-align: center;
+}
+
+button {
+    background-color: #646162;
+
+    border-color: transparent;
+    border-radius: 8px;
+    height: 40px;
+    user-select: none;
+    outline: 0;
+    width: 100%;
+    margin-top: 100px;
+
+    font-family: 'Gentium Book Plus', serif;
+    font-size: 25px;
+    font-weight: 400;
+
+    transition: opacity 0.9s;
+    color: #FFFFFF;
+}
+
+h3 {
+    text-align: center;
+}
+
+button:hover {
+    cursor: pointer;
+    opacity: 90%;
+}
+
+.termedic {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+}
+
+.certified {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+}
+
+.termedic img {
+    margin-left: 20px;
+    margin-bottom: 13px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* .titles h3 {
+    margin-right: 20px;
+} */
+
+.options {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
+.options img {
+    width: 35px;
+    height: 35px;
+
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
+/* .option button {
+    inline-size: none;
+    background-color: #FFFFFF;
+} */
+
+button#import {
+    background-color: #646162;
+
+    border-color: transparent;
+    border-radius: 8px;
+    height: 40px;
+    user-select: none;
+    outline: 0;
+    width: 100%;
+    max-width: 350px;
+
+    font-family: 'Gentium Book Plus', serif;
+    font-size: 25px;
+    font-weight: 400;
+
+    color: #FFFFFF;
+}
+
+p#mod {
+    color: #e02041;
+    cursor: pointer;
+}
+
+h1 {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 35px;
+}
+
+.title {
+    font-weight: bold;
+}
+
+.br {
+    color: #FFFFFF;
+}
+
+p {
+    font-weight: normal;
+}
+
+.table-responsive {
+    margin-top: 100px;
+    display: grid;
+    width: 100% !important;
+}
+
+.table {
+    width: 100% !important;
+    margin: auto;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.table-status {
+    margin-top: 20px;
+    margin-bottom: 20px !important;
+}
+
+th {
+    /* width: 100%; */
+    text-align: start;
+    font-weight: normal;
+    padding-right: 20px;
+}
+
+img#back {
+    position: fixed;
+    height: 25px;
+    width: 25px;
+    top: 20px;
+    left: 20px;
+}
+
+img#edit, img#rmv {
+    width: 15px;
+    height: 15px;
+
+    margin-top: 18px;
+    margin-right: 8px;
+}
+
+img:hover {
+    cursor: pointer;
+}
+
+.tableDivs {
+    align-items: flex-start;
+    justify-content: flex-start;
+    display: flex;
+    text-align: start;
+    margin-bottom: -15px;
+}

@@ -54,10 +54,10 @@ window.onload = async () => {
         document.querySelector("div.btn").style.left = "25px"
         document.getElementById("help").style.marginLeft = "90px"
 
-        console.log(join(__dirname, "..", "..", "operacoes.json"))
+        // console.log(join(__dirname, "..", "..", "operacoes.json"))
 
         let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "operacoes.json")))
-        console.log(data)
+        // console.log(data)
 
         let operaList = []
         for (i in data) {
@@ -85,6 +85,18 @@ window.onload = async () => {
 
         document.getElementById("tabela").appendChild(info)
     }
+
+    if (localStorage.getItem("editItem") == 1) {
+        let inputs = document.querySelectorAll("input");
+        let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
+        data = data[0][5]
+
+        inputs.forEach(i => {
+            if (data.includes(i.id)) {
+                i.checked = true
+            } 
+        })
+    }
 }
 
 function importar() {
@@ -96,8 +108,8 @@ ipcRenderer.on("operaData", async (event, arg) => {
     await xlsxFile(arg).then((rows) => {
         for (i in rows) {
             if ((rows[i][0] != null && rows[i][1] != null) && !isNaN(rows[i][2])) {
-                if (opera[String(rows[i][0]).toUpperCase()+ " - " + rows[i][1]] == undefined)
-                    opera[String(rows[i][0]).toUpperCase()+ " - " + rows[i][1]] = [rows[i][1], 0, 1, 0]
+                if (opera[String(rows[i][0]).toUpperCase() + " - " + rows[i][1]] == undefined)
+                    opera[String(rows[i][0]).toUpperCase() + " - " + rows[i][1]] = [rows[i][1], 0, 1, 0]
 
                 if (opera[String(rows[i][0]).toUpperCase() + " - " + rows[i][1]] == undefined)
                     opera[String(rows[i][0]).toUpperCase() + " - " + rows[i][1]] = [rows[i][1], 0, 1, 0]
