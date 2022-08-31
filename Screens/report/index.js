@@ -100,10 +100,6 @@ window.onload = async () => {
     document.getElementById("continue").addEventListener("click", () => ipcRenderer.send("markupScreen"))
 
     document.getElementById("back").addEventListener("click", async () => {
-        try {
-            await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
-        }
-        catch { }
         ipcRenderer.send("backOpera")
     })
     document.getElementById("help").addEventListener("click",

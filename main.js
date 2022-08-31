@@ -114,7 +114,6 @@ ipcMain.on("backOpera", () => {
 ipcMain.on("closeShop", () => {
     shopping.close()
     shopping = undefined
-    mainWin.focus()
 })
 
 ipcMain.on("embamOrc", () => {

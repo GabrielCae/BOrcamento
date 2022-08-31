@@ -149,6 +149,58 @@ p {
     margin-right: 120px;
 }
 
+.confirm, .add, .new {
+    white-space: nowrap;
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    text-align: center;
+}
+/* 
+.confirm, .add, .new p {
+    margin-bottom: 15px;
+} */
+
+.confirm:hover #comentario {
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    color: #000000;
+    margin-right: 50px;
+}
+.confirm img {
+    margin-top: 10px;
+}
+
+.add:hover #comentario {
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    color: #000000;
+    margin-right: 50px;
+}
+.add img {
+    margin-top: 10px;
+}
+
+.new:hover #comentario {
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    color: #000000;
+    margin-right: 50px;
+}
+.new img {
+    margin-top: 10px;
+}
+
+#comentario {
+    position: relative;
+    top: 20;
+    display: none;
+    color: #FFFFFF;
+}
+
 .custoMaxx {
     text-align: center;
     align-content: center;
@@ -180,12 +232,14 @@ img {
 }
 
 img#rmv {
+    position: fixed;
     display: flex;
     width: 50px;
     height: 50px;
 }
 
 img#help {
+    position: fixed;
     position: absolute;
     height: 35px;
     width: 35px;

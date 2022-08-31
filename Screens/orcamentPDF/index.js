@@ -56,6 +56,10 @@ ipcRenderer.on("hideContent", (event, arg) => {
 })
 
 ipcRenderer.on("showContent", () => {
+    ipcRenderer.send("showMsg", [
+        "PDF Gerado com sucesso!",
+        "info"
+    ])
     document.getElementById("pdf").style.display = "grid"
 })
 

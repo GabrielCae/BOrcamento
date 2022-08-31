@@ -89,10 +89,11 @@ window.onload = async () => {
     if (localStorage.getItem("editItem") == 1) {
         let inputs = document.querySelectorAll("input");
         let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
-        data = data[0][5]
+        data = data[localStorage.getItem("editId")]
+        console.log(data)
 
         inputs.forEach(i => {
-            if (data.includes(i.id)) {
+            if (data[5].includes(i.id)) {
                 i.checked = true
             } 
         })

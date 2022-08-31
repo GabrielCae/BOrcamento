@@ -98,8 +98,6 @@ function calc() {
         parseFloat(document.getElementById("ir").value) / 100 +
         parseFloat(document.getElementById("icms").value) / 100 + parseFloat(document.getElementById("mc").value) / 100)
 
-    console.log(markup)
-
     // if (markup < 0) markup *= -1
 
     let pvMax = parseFloat(localStorage.getItem("totalMaximo") / markup).toFixed(2)
@@ -149,10 +147,14 @@ window.onload = async () => {
 
     }, 500);
 
-    document.getElementById("imgAdd").addEventListener("click", async () => {
+    if (localStorage.getItem("editItem") == 1) 
+        document.querySelector("p.adddd").textContent = "Atualizar Item"
+
+    document.getElementById("add").addEventListener("click", async () => {
         if (localStorage.getItem("editItem") == 1) {
             let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
-            data.splice(data[localStorage.getItem("editId")], 1)
+            data.splice(localStorage.getItem("editId"), 1)
+            console.log(data, localStorage.getItem("editId"), localStorage.getItem("editItem"))
 
             localStorage.setItem("editItem", 0)
             await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"), JSON.stringify(data))
@@ -188,7 +190,7 @@ window.onload = async () => {
             JSON.stringify(data))
     })
 
-    document.getElementById("imgNew").addEventListener("click", async () => {
+    document.getElementById("new").addEventListener("click", async () => {
         try {
             await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
         }
@@ -196,9 +198,10 @@ window.onload = async () => {
         ipcRenderer.send("backTo")
     })
 
-    document.getElementById("imgConfirm").addEventListener("click", async () => {
+    document.getElementById("confirm").addEventListener("click", async () => {
         localStorage.setItem("ipi", document.getElementById("ipi").value)
         localStorage.setItem("onlyView", 0)
+        ipcRenderer.send("closeShop")
         ipcRenderer.send("orcamentPDF")
     })
 
