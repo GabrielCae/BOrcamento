@@ -112,7 +112,9 @@ ipcMain.on("backOpera", () => {
 })
 
 ipcMain.on("closeShop", () => {
-    shopping.close()
+    try {
+        shopping.close()
+    } catch {  }
     shopping = undefined
 })
 

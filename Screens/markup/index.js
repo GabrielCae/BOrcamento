@@ -175,6 +175,13 @@ window.onload = async () => {
             perform("infos")
         ])
 
+        localStorage.setItem("operations", "")
+        localStorage.setItem("mpSelected", "")
+        localStorage.setItem("opt", "")
+        localStorage.setItem("qtde", "")
+        localStorage.setItem("pvMin", "")
+        localStorage.setItem("pvMax", "")
+
         let json = {
             pis: parseFloat(document.getElementById("pis").value),
             ir: parseFloat(document.getElementById("ir").value),

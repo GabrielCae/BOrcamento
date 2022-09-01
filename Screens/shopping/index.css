@@ -169,6 +169,14 @@ img#back {
     left: 20px;
 }
 
+img#confirm {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    bottom: 20px;
+    right: 20px;
+}
+
 img#edit, img#rmv {
     width: 15px;
     height: 15px;

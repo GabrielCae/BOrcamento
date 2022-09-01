@@ -64,6 +64,12 @@ function isUpperCase(str) {
 }
 
 window.onload = async () => {
+    document.getElementById("confirm").addEventListener("click", async () => {
+        localStorage.setItem("onlyView", 0)
+        ipcRenderer.send("closeShop")
+        ipcRenderer.send("orcamentPDF")
+    })
+
     let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
 
     if (data.length > 0) {
