@@ -28,11 +28,44 @@ window.onload = async () => {
         }
     } catch { }
 
-    console.log(localStorage.getItem("editItem"))
+    if (localStorage.getItem("editItem") != 0) {
+        let data = []
 
-    if (localStorage.getItem("editItem") == 1) {
-        let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
-        data = data[localStorage.getItem("editId")]
+        if (localStorage.getItem("editItem") == 1) {
+            data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
+            data = data[localStorage.getItem("editId")]
+        } else {
+            // if (localStorage.getItem("idToView") == "") {
+            data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+            data = data[localStorage.getItem("editId")]
+
+            let mps = []
+            for (j = 0; j < data[0].length; j++) {
+                if ((isNaN(data[0][j]) && !String(data[0][j]).startsWith("R$")
+                    && !String(data[0][j]).startsWith("IPI")) &&
+                    isUpperCase(data[0][j]) && !Array.isArray(data[0][j]) &&
+                    String(data[0][j]) != "---") {
+
+                    mps.push(data[0][j])
+                }
+            }
+
+            let mp = localStorage.getItem("idToView") == "" ? 
+            data[0].indexOf(mps[localStorage.getItem("editName") - 1]) :
+            parseFloat(localStorage.getItem("editName"))
+
+            localStorage.setItem("mpp", mp)
+
+            data = [
+                data[0][mp],
+                data[0][mp + 1],
+                data[0][mp + 2],
+                data[0][mp + 3],
+                data[0][mp + 4],
+                data[0][mp + 5]
+            ]
+            // } else console.log("AAA")
+        }
 
         let select = document.getElementById("materials")
         let options = [...select.options]
@@ -57,12 +90,18 @@ window.onload = async () => {
         adjustInputs()
         let inputs = document.querySelectorAll("input");
         let values = []
-        for (j in data[6]) {
-            values.push(data[6][j])
+        console.log(localStorage.getItem("editItem"))
+        for (j in data[localStorage.getItem("editItem") == 1 ? 6 : 5]) {
+            values.push(data[localStorage.getItem("editItem") == 1 ? 6 : 5][j])
         }
+        // console.log(values)
+
+        if (localStorage.getItem("editItem") == 2)
+            await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"), JSON.stringify(data))
+
         i = 0
         inputs.forEach(input => {
-            console.log(i)
+            // console.log(i)
             if (input.style.display != "none") {
                 input.value = values[i]
                 i++
@@ -207,6 +246,10 @@ async function removeMP() {
             "mpEmb.json" : "mpTerm.json"), json)
         location.reload()
     }
+}
+
+function isUpperCase(str) {
+    return String(str) === String(str).toUpperCase();
 }
 
 function addOptions() {

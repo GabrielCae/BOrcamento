@@ -8,7 +8,7 @@ window.onload = () => {
         try {
             await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
         } catch (err) { console.log(err) }
-        localStorage.setItem("editItem", false)
+        localStorage.setItem("editItem", 0)
 
         ipcRenderer.send("newOrc")
     })

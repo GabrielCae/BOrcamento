@@ -147,54 +147,80 @@ window.onload = async () => {
 
     }, 500);
 
-    if (localStorage.getItem("editItem") == 1) 
+    if (localStorage.getItem("editItem") != 0)
         document.querySelector("p.adddd").textContent = "Atualizar Item"
 
     document.getElementById("add").addEventListener("click", async () => {
-        if (localStorage.getItem("editItem") == 1) {
-            let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
-            data.splice(localStorage.getItem("editId"), 1)
-            console.log(data, localStorage.getItem("editId"), localStorage.getItem("editItem"))
-
-            localStorage.setItem("editItem", 0)
-            await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"), JSON.stringify(data))
-        }
-
         let operations = perform()
-        let data = fs.existsSync(join(__dirname, "..", "..", "temp.json")) ?
-            JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json"))) :
-            []
 
-        data.push([
-            localStorage.getItem("mpSelected"),
-            localStorage.getItem("opt"),
-            localStorage.getItem("qtde"),
-            localStorage.getItem("pvMin"),
-            localStorage.getItem("pvMax"),
-            operations,
-            perform("infos")
-        ])
+        if (localStorage.getItem("editItem") != 0) {
+            let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
+            if (localStorage.getItem("editItem") == 1) {
+                data.splice(localStorage.getItem("editId"), 1)
+                console.log(data, localStorage.getItem("editId"), localStorage.getItem("editItem"))
 
-        localStorage.setItem("operations", "")
-        localStorage.setItem("mpSelected", "")
-        localStorage.setItem("opt", "")
-        localStorage.setItem("qtde", "")
-        localStorage.setItem("pvMin", "")
-        localStorage.setItem("pvMax", "")
+                localStorage.setItem("editItem", 0)
+                await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"), JSON.stringify(data))
+            } else {
 
-        let json = {
-            pis: parseFloat(document.getElementById("pis").value),
-            ir: parseFloat(document.getElementById("ir").value),
-            icms: parseFloat(document.getElementById("icms").value),
-            mc: parseFloat(document.getElementById("mc").value),
-            ipi: parseFloat(document.getElementById("ipi").value)
+                let baseData = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+                let mp = parseFloat(localStorage.getItem("mpp"))
+
+                baseData[0][0][mp + 2] = localStorage.getItem("pvMin")
+                baseData[0][0][mp + 3] = localStorage.getItem("pvMax")
+                baseData[0][0][mp + 4] = operations
+                baseData[0][0][mp + 5] = perform("infos")
+
+                await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"),
+                    JSON.stringify(baseData))
+
+
+                localStorage.setItem("onlyView", 1)
+                localStorage.setItem("idToView", localStorage.getItem("editId"))
+                ipcRenderer.send("orcamentPDF")
+
+            }
         }
-        await fs.writeFileSync(join(__dirname, "..", "..", "impostos.json"), JSON.stringify(json))
 
-        ipcRenderer.send("openShop")
+        if (localStorage.getItem("editItem") < 2) {
+            let data = fs.existsSync(join(__dirname, "..", "..", "temp.json")) ?
+                JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json"))) :
+                []
 
-        await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
-            JSON.stringify(data))
+            data.push([
+                localStorage.getItem("mpSelected"),
+                localStorage.getItem("opt"),
+                localStorage.getItem("qtde"),
+                localStorage.getItem("pvMin"),
+                localStorage.getItem("pvMax"),
+                operations,
+                perform("infos")
+            ])
+
+            localStorage.setItem("operations", "")
+            localStorage.setItem("mpSelected", "")
+            localStorage.setItem("opt", "")
+            localStorage.setItem("qtde", "")
+            localStorage.setItem("pvMin", "")
+            localStorage.setItem("pvMax", "")
+
+            let json = {
+                pis: parseFloat(document.getElementById("pis").value),
+                ir: parseFloat(document.getElementById("ir").value),
+                icms: parseFloat(document.getElementById("icms").value),
+                mc: parseFloat(document.getElementById("mc").value),
+                ipi: parseFloat(document.getElementById("ipi").value)
+            }
+            await fs.writeFileSync(join(__dirname, "..", "..", "impostos.json"), JSON.stringify(json))
+
+            ipcRenderer.send("openShop")
+
+            await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
+                JSON.stringify(data))
+        } else {
+            await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
+            ipcRenderer.send("backMain")
+        }
     })
 
     document.getElementById("new").addEventListener("click", async () => {
@@ -202,6 +228,7 @@ window.onload = async () => {
             await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
         }
         catch { }
+        localStorage.setItem("editItem", 0)
         ipcRenderer.send("backTo")
     })
 

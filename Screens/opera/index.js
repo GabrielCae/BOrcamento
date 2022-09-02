@@ -86,17 +86,19 @@ window.onload = async () => {
         document.getElementById("tabela").appendChild(info)
     }
 
-    if (localStorage.getItem("editItem") == 1) {
+    if (localStorage.getItem("editItem") != 0) {
         let inputs = document.querySelectorAll("input");
         let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
-        data = data[localStorage.getItem("editId")]
         console.log(data)
 
+        if (localStorage.getItem("editItem") == 1) data = data[localStorage.getItem("editId")]
+
         inputs.forEach(i => {
-            if (data[5].includes(i.id)) {
+            if (data[localStorage.getItem("editItem") == 1 ? 5 : 4].includes(i.id)) {
                 i.checked = true
-            } 
+            }
         })
+
     }
 }
 

@@ -50,6 +50,10 @@ async function addTitle(id, text, className) {
     document.getElementById(id).appendChild(p)
 }
 
+function perform(info = "operations") {
+    return localStorage.getItem(info).split(",")
+}
+
 async function addBr(id) {
     let p = document.createElement("p")
 
@@ -89,8 +93,10 @@ async function removeMP(className) {
 }
 
 async function editMP(className) {
-    localStorage.setItem("editItem", 1)
-    localStorage.setItem("editId", className)
+    localStorage.setItem("editItem", 2)
+    localStorage.setItem("editId", id)
+    localStorage.setItem("editName", className)
+
     ipcRenderer.send("backTo")
 }
 
@@ -127,17 +133,23 @@ window.onload = async () => {
         for (i = 0; i < infos[0].length; i++) {
             if ((isNaN(infos[0][i]) && !String(infos[0][i]).startsWith("R$")
                 && !String(infos[0][i]).startsWith("IPI")) &&
-                isUpperCase(infos[0][i])) {
+                isUpperCase(infos[0][i]) && !Array.isArray(infos[0][i])) {
+
                 if (!String(infos[0][i + 1]).startsWith("IPI")) {
                     addText("id", j, false)
                     j++
                 }
                 addText("mp", infos[0][i], false, String(infos[0][i]) != "---", i)
                 addText("desc", infos[0][i + 1], false)
-                addText("rstotalmed", infos[0][i + 2], false)
+                addText("rstotalmed", !String(infos[0][i + 2]).startsWith("R$ ") ?
+                    "R$ " + infos[0][i + 2] :
+                    infos[0][i + 2], false)
                 totalMedio += parseFloat(String(infos[0][i + 2]).replace("R$ ", ""))
-                addText("rstotalmax", infos[0][i + 3], false)
+                addText("rstotalmax", !String(infos[0][i + 3]).startsWith("R$ ") ?
+                "R$ " + infos[0][i + 3] :
+                infos[0][i + 3], false, false)
                 totalMaximo += parseFloat(String(infos[0][i + 3]).replace("R$ ", ""))
+
             }
         }
 
@@ -157,6 +169,7 @@ window.onload = async () => {
         document.getElementById("data").textContent = infos[1]
         document.getElementById("title").textContent = "Orçamento - " + localStorage.getItem("idToView")
     } else {
+        localStorage.setItem("idToView", "")
         if (fs.existsSync(join(__dirname, "..", "..", "orcamentos.json"))) {
             let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
 
@@ -184,6 +197,8 @@ window.onload = async () => {
             addText("rstotalmax", "R$ " + parseFloat(localStorage.getItem("pvMax"))
                 .toFixed(2))
             totalMaximo += parseFloat(localStorage.getItem("pvMax"))
+            orcament.push(perform())
+            orcament.push(perform("info"))
         }
 
         if (fs.existsSync(join(__dirname, "..", "..", "temp.json"))) {
@@ -197,6 +212,8 @@ window.onload = async () => {
                 totalMedio += parseFloat(data[i][3])
                 addText("rstotalmax", "R$ " + parseFloat(data[i][4]).toFixed(2))
                 totalMaximo += parseFloat(data[i][4])
+                orcament.push(data[i][5])
+                orcament.push(data[i][6])
             }
 
             // console.log(Array(operations).push("AA"))
