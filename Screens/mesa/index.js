@@ -1,4 +1,4 @@
-const { ipcRenderer, dialog } = require("electron")
+const { ipcRenderer, dialog, BrowserWindow } = require("electron")
 const fs = require("fs")
 const { join } = require("path")
 
@@ -35,37 +35,29 @@ window.onload = async () => {
             data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
             data = data[localStorage.getItem("editId")]
         } else {
-            // if (localStorage.getItem("idToView") == "") {
             data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
             data = data[localStorage.getItem("editId")]
 
-            let mps = []
-            for (j = 0; j < data[0].length; j++) {
-                if ((isNaN(data[0][j]) && !String(data[0][j]).startsWith("R$")
-                    && !String(data[0][j]).startsWith("IPI")) &&
-                    isUpperCase(data[0][j]) && !Array.isArray(data[0][j]) &&
-                    String(data[0][j]) != "---") {
+            newData = [data[0], data[1], data[2]]
+            className = localStorage.getItem("onlyView") == 1 ?
+                parseFloat(localStorage.getItem("editName")) :
+                0 + (parseFloat(localStorage.getItem("editName")) - 1) * 8
+            // console.log(className, data, parseFloat(localStorage.getItem("editName")))
 
-                    mps.push(data[0][j])
-                }
-            }
-
-            let mp = localStorage.getItem("idToView") == "" ? 
-            data[0].indexOf(mps[localStorage.getItem("editName") - 1]) :
-            parseFloat(localStorage.getItem("editName"))
-
-            localStorage.setItem("mpp", mp)
+            localStorage.setItem("mpp", className)
 
             data = [
-                data[0][mp],
-                data[0][mp + 1],
-                data[0][mp + 2],
-                data[0][mp + 3],
-                data[0][mp + 4],
-                data[0][mp + 5]
+                data[0][className],
+                data[0][className + 1],
+                data[0][className + 2],
+                data[0][className + 3],
+                data[0][className + 4],
+                data[0][className + 5],
+                data[0][className + 6],
+                data[0][className + 7],
             ]
-            // } else console.log("AAA")
         }
+        // console.log(data)
 
         let select = document.getElementById("materials")
         let options = [...select.options]
@@ -90,9 +82,8 @@ window.onload = async () => {
         adjustInputs()
         let inputs = document.querySelectorAll("input");
         let values = []
-        console.log(localStorage.getItem("editItem"))
-        for (j in data[localStorage.getItem("editItem") == 1 ? 6 : 5]) {
-            values.push(data[localStorage.getItem("editItem") == 1 ? 6 : 5][j])
+        for (j in data[localStorage.getItem("editItem") == 1 ? 6 : 7]) {
+            values.push(data[localStorage.getItem("editItem") == 1 ? 6 : 7][j])
         }
         // console.log(values)
 
@@ -109,10 +100,23 @@ window.onload = async () => {
         })
     }
 
-    document.getElementById("right").addEventListener("click", () => {
+    ipcRenderer.on("higiRes", (event, arg) => {
+        console.log(arg)
+        if (arg == 0) localStorage.setItem("higie", true)
+        else if (arg == 1) localStorage.setItem("higie", false)
+
+        if (arg != 2) {
+            localStorage.setItem("mpSelected", mp)
+            localStorage.setItem("opt", name)
+            localStorage.setItem("infos", infos)
+            ipcRenderer.send("operations")
+        }
+    })
+
+    let infos = []
+    document.getElementById("right").addEventListener("click", async () => {
         let inputs = document.querySelectorAll("input");
         let show = false
-        let infos = []
         inputs.forEach(i => {
             if (i.style.display != "none") {
                 if (i.value != 0 && i.value != "") {
@@ -122,12 +126,8 @@ window.onload = async () => {
                 else show = false
             }
         })
-        if (show) {
-            localStorage.setItem("mpSelected", mp)
-            localStorage.setItem("opt", name)
-            localStorage.setItem("infos", infos)
-            ipcRenderer.send("operations")
-        } else error("Preencha todas as informações!")
+        if (show) ipcRenderer.send("higi")
+        else error("Preencha todas as informações!")
     })
 
     setInterval(() => {

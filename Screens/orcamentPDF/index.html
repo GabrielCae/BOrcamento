@@ -14,18 +14,21 @@
     <div class="titles">
         <div class="termedic">
             <img src="../../assets/termedic.png" id="termedicImg" alt="certified">
-            <p id="pT">Ajapi, Rio Claro</p>
-        </div>
-        <div class="certified">
+            <h3 id="data">Data</h3>
             <img src="../../assets/certified.png" id="sintegraImg" alt="certified">
-            <h3>Sintegra Sciencies</h1>
         </div>
+
+        <div class="texts">
+            <p id="pT">Ajapi, Rio Claro</p>
+            <h3 id="sin">Sintegra Sciencies</h3>
+            <h3 id="title">Orçamento - ID</h3>
+            <h3 id="titlee"> </h3>
+        </div>
+        <!-- <div class="certified">
+        </div> -->
     </div>
 
-    <div class="table-responsive">
-        <h3 id="data">Data</h3>
-        <h3 id="title">Orçamento - ID</h3>
-
+    <div id="tablee" class="table-responsive">
         <!-- <img src="../../assets/arrow.png" alt="arrow" id="back"> -->
 
         <table class="table">
@@ -43,15 +46,21 @@
                     <th id="rstotalmed">
                         <p class="title">R$ Médio</p>
                     </th>
+                    <th id="ipimed">
+                        <p class="title">R$ IPI Médio</p>
+                    </th>
                     <th id="rstotalmax">
                         <p class="title">R$ Máximo</p>
+                    </th>
+                    <th id="ipimax">
+                        <p class="title">R$ IPI Máximo</p>
                     </th>
                 </tr>
             </thead>
         </table>
 
         <button type="button" onclick="generatePDF()" id="pdf">Gerar PDF</button>
-
+        <!-- <img src="../../assets/add.png" alt="add" id="add"> -->
     </div>
 
 </body>

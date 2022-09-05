@@ -120,16 +120,31 @@ window.onload = async () => {
         let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..",
             localStorage.getItem("empresa") == "EMBAMED" ?
                 "mpEmb.json" : "mpTerm.json")))
-        await addText("rsuni", String("R$ "+parseFloat(preco[localStorage.getItem("mpSelected")]).toFixed(2))
+        await addText("rsuni", String("R$ " + parseFloat(preco[localStorage.getItem("mpSelected")][0]).toFixed(2))
             .replace(".", ","))
         await addText("unid", "kg")
         await addText("qtde", String(parseFloat(localStorage.getItem("info").split(",")[1]).toFixed(4))
             .replace(".", ","), false)
         await addBr("conj")
         await addBr("conj")
-        totalMP = parseFloat(preco[localStorage.getItem("mpSelected")] *
+        totalMP = parseFloat(preco[localStorage.getItem("mpSelected")][0] *
             parseFloat(localStorage.getItem("qtde")).toFixed(4)) * 1
         await addText("rstotal", "R$ " + String(totalMP.toFixed(2)).replace(".", ","))
+
+        console.log(localStorage.getItem("higie"))
+        if (localStorage.getItem("higie") == "true") {
+            let config = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
+            console.log(config["higi"], config)
+
+            await addBr("mp")
+            await addText("desc", "Higienização")
+            await addBr("rsuni", String("R$ " + parseFloat(config["higi"]).toFixed(2)).replace(".", ","))
+            await addBr("unid")
+            await addBr("qtde")
+            await addBr("conj")
+            totalMP += parseFloat(config["higi"])
+            await addText("rstotal", "R$ " + String(parseFloat(config["higi"]).toFixed(2)).replace(".", ","))
+        }
 
         // espaçamento
 

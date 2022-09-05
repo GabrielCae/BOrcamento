@@ -79,22 +79,32 @@ async function removeMP(className) {
     let newData = []
 
     for (i in data) {
-        if (i == localStorage.getItem("idToView")) {
+        if ((localStorage.getItem("onlyView") == 1) ? i == localStorage.getItem("idToView") :
+            i == id) {
+            // console.log(data)
             newData = [data[i][0], data[i][1], data[i][2]]
-            newData[0].splice(className, 4)
-            console.log(className, newData)
-            // break
+            if (localStorage.getItem("onlyView") == 0)
+                className = 0 + (parseFloat(className) - 1) * 8
+
+            newData[0].splice(className, 8)
         }
     }
 
-    data[localStorage.getItem("idToView")] = newData
+    data[localStorage.getItem("onlyView") == 1 ? localStorage.getItem("idToView") : id] = newData
+    console.log(data)
     await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"), JSON.stringify(data))
+    if (localStorage.getItem("onlyView") == 0) {
+        localStorage.setItem("onlyView", 1)
+        localStorage.setItem("idToView", id)
+    }
     location.reload()
 }
 
 async function editMP(className) {
     localStorage.setItem("editItem", 2)
-    localStorage.setItem("editId", id)
+    localStorage.setItem("editId", localStorage.getItem("onlyView") == 1 ?
+        localStorage.getItem("idToView")
+        : id)
     localStorage.setItem("editName", className)
 
     ipcRenderer.send("backTo")
@@ -103,6 +113,9 @@ async function editMP(className) {
 ipcRenderer.on("hideContent", (event, arg) => {
     if (arg != undefined) {
         document.getElementById("pdf").style.display = "none"
+
+        document.getElementById("rmv").style.display = "none"
+        document.getElementById("edit").style.display = "none"
 
         ipcRenderer.send("emitPDF", arg)
     }
@@ -114,14 +127,19 @@ ipcRenderer.on("showContent", () => {
         "info"
     ])
     document.getElementById("pdf").style.display = "grid"
+    document.getElementById("rmv").style.display = "flex"
+    document.getElementById("edit").style.display = "flex"
 })
 
 window.onload = async () => {
+    let totalMedio = 0
+    let totalMaximo = 0
+    let ipiMax = 0
+    let ipiMedio = 0
+
     if (localStorage.getItem("onlyView") == 1) {
         let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
         let infos = []
-        let totalMedio = 0
-        let totalMaximo = 0
 
         for (i in data) {
             if (i == localStorage.getItem("idToView")) infos = data[i]
@@ -141,22 +159,35 @@ window.onload = async () => {
                 }
                 addText("mp", infos[0][i], false, String(infos[0][i]) != "---", i)
                 addText("desc", infos[0][i + 1], false)
+
                 addText("rstotalmed", !String(infos[0][i + 2]).startsWith("R$ ") ?
                     "R$ " + infos[0][i + 2] :
                     infos[0][i + 2], false)
                 totalMedio += parseFloat(String(infos[0][i + 2]).replace("R$ ", ""))
-                addText("rstotalmax", !String(infos[0][i + 3]).startsWith("R$ ") ?
-                "R$ " + infos[0][i + 3] :
-                infos[0][i + 3], false, false)
-                totalMaximo += parseFloat(String(infos[0][i + 3]).replace("R$ ", ""))
+
+                addText("ipimed", !String(infos[0][i + 3]).startsWith("R$ ") ?
+                    "R$ " + infos[0][i + 3] :
+                    infos[0][i + 3], false)
+                ipiMedio += parseFloat(String(infos[0][i + 3]).replace("R$ ", ""))
+
+                addText("ipimax", !String(infos[0][i + 4]).startsWith("R$ ") ?
+                    "R$ " + infos[0][i + 4] :
+                    infos[0][i + 4], false, false)
+                ipiMax += parseFloat(String(infos[0][i + 4]).replace("R$ ", ""))
+
+                addText("rstotalmax", !String(infos[0][i + 5]).startsWith("R$ ") ?
+                    "R$ " + infos[0][i + 5] :
+                    infos[0][i + 5], false, false)
+                totalMaximo += parseFloat(String(infos[0][i + 5]).replace("R$ ", ""))
 
             }
         }
 
         addBr("rstotalmed")
         addBr("rstotalmax")
+        addBr("ipimax")
+        addBr("ipimed")
         addBr("desc")
-        addBr("id")
         for (i = 0; i < 2; i++) {
             addBr("mp")
             addBr("id")
@@ -165,6 +196,8 @@ window.onload = async () => {
         addText("desc", "Total: ", false)
         addText("rstotalmed", "R$ " + totalMedio.toFixed(2), false)
         addText("rstotalmax", "R$ " + totalMaximo.toFixed(2), false)
+        addText("ipimed", "R$ " + ipiMedio.toFixed(2), false)
+        addText("ipimax", "R$ " + ipiMax.toFixed(2), false)
 
         document.getElementById("data").textContent = infos[1]
         document.getElementById("title").textContent = "Orçamento - " + localStorage.getItem("idToView")
@@ -183,20 +216,33 @@ window.onload = async () => {
 
         var data = new Date().toLocaleDateString();
         document.getElementById("data").textContent = data
-        let totalMedio = 0
-        let totalMaximo = 0
+        let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..",
+            localStorage.getItem("empresa") == "EMBAMED" ?
+                "mpEmb.json" : "mpTerm.json")))
 
         if (localStorage.getItem("mpSelected") != "" && localStorage.getItem("operations") != "" &&
             localStorage.getItem("pvMin") != "") {
+
             addText("id", 0, false)
             addText("mp", localStorage.getItem("mpSelected"), true, true, 0)
             addText("desc", localStorage.getItem("opt"))
+
             addText("rstotalmed", "R$ " + parseFloat(localStorage.getItem("pvMin"))
                 .toFixed(2))
             totalMedio += parseFloat(localStorage.getItem("pvMin"))
+
+            let ipiTemp = ((localStorage.getItem("ipi")) / 100 * localStorage.getItem("pvMin"))
+            addText("ipimed", "R$ " + parseFloat(ipiTemp).toFixed(2))
+            ipiMedio += parseFloat(ipiTemp)
+
             addText("rstotalmax", "R$ " + parseFloat(localStorage.getItem("pvMax"))
                 .toFixed(2))
             totalMaximo += parseFloat(localStorage.getItem("pvMax"))
+
+            ipiTemp = ((localStorage.getItem("ipi")) / 100 * localStorage.getItem("pvMax"))
+            addText("ipimax", "R$ " + parseFloat(ipiTemp).toFixed(2))
+            ipiMax += parseFloat(ipiTemp)
+
             orcament.push(perform())
             orcament.push(perform("info"))
         }
@@ -208,10 +254,24 @@ window.onload = async () => {
                 addText("id", parseFloat(i) + 1, false)
                 addText("mp", data[i][0], true, true, parseFloat(i) + 1)
                 addText("desc", data[i][1])
-                addText("rstotalmed", "R$ " + parseFloat(data[i][3]).toFixed(2))
-                totalMedio += parseFloat(data[i][3])
-                addText("rstotalmax", "R$ " + parseFloat(data[i][4]).toFixed(2))
-                totalMaximo += parseFloat(data[i][4])
+
+                // console.log((preco[data[i][0]][1] ? higiPreco : 0))
+                let precoM = parseFloat(data[i][3])
+                addText("rstotalmed", "R$ " + precoM.toFixed(2))
+                totalMedio += precoM
+
+                let ipiTemp = (data[i][7] / 100) * precoM
+                addText("ipimed", "R$ " + parseFloat(ipiTemp).toFixed(2))
+                ipiMedio += parseFloat(ipiTemp)
+
+                precoM = parseFloat(data[i][4])
+                ipiTemp = (data[i][7] / 100) * precoM
+                addText("ipimax", "R$ " + parseFloat(ipiTemp).toFixed(2))
+                ipiMax += parseFloat(ipiTemp)
+
+                addText("rstotalmax", "R$ " + precoM.toFixed(2))
+                totalMaximo += precoM
+
                 orcament.push(data[i][5])
                 orcament.push(data[i][6])
             }
@@ -222,24 +282,20 @@ window.onload = async () => {
         // console.log(totalMedio, totalMaximo)
         addBr("rstotalmed")
         addBr("rstotalmax")
+        addBr("ipimed")
+        addBr("ipimax")
         addBr("desc")
-        addBr("id")
         for (i = 0; i < 2; i++) {
             addBr("id")
             addBr("mp")
         }
 
-        let ipi = parseFloat(localStorage.getItem("ipi")) / 100
-
-        addText("mp", "---")
-        addText("desc", "IPI")
-        addText("rstotalmed", "R$ " + (ipi * totalMedio).toFixed(2))
-        addText("rstotalmax", "R$ " + (ipi * totalMaximo).toFixed(2))
-
         addText("desc", "Total: ", false)
 
-        addText("rstotalmed", "R$ " + ((ipi * totalMedio) + totalMedio).toFixed(2), false)
-        addText("rstotalmax", "R$ " + ((ipi * totalMaximo) + totalMaximo).toFixed(2), false)
+        addText("ipimed", "R$ " + ipiMedio.toFixed(2), false)
+        addText("rstotalmed", "R$ " + totalMedio.toFixed(2), false)
+        addText("ipimax", "R$ " + ipiMax.toFixed(2), false)
+        addText("rstotalmax", "R$ " + totalMaximo.toFixed(2), false)
         if (!fs.existsSync(join(__dirname, "..", "..", "orcamentos.json")))
             await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"),
                 JSON.stringify({}))

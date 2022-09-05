@@ -1,4 +1,5 @@
 body {
+    overflow-x: hidden !important;
     -webkit-display: grid;
     display: grid;
     -webkit-align-items: center;
@@ -14,11 +15,74 @@ body {
     text-align: center;
 }
 
-.termedic, .certified {
+.termedic,
+.certified {
+    width: 100%;
     justify-content: center;
-    display: grid;
+    display: flex;
     align-items: center;
     text-align: center;
+}
+
+.texts {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 90px;
+}
+
+p#pT {
+    position: absolute;
+    top: 120px;
+    left: 100px;
+}
+
+h3#title {
+    position: absolute;
+    top: 110px;
+    right: 0;
+    left: 0;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+#titlee {
+    color: #FFFF;
+
+    position: absolute;
+    top: 130px;
+    width: 85%;
+
+    padding: .5em 0;
+	border-bottom: 2px dashed rgb(136, 134, 134);
+}
+
+h3#sin {
+    position: absolute;
+    top: 110px;
+    right: 50px;
+}
+
+img#sintegraImg {
+    position: absolute;
+    top: -10px;
+    right: 80px;
+}
+
+img#termedicImg {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+h3#data {
+    position: absolute;
+    top: 0;
+    right: 23px;
+    left: -23px;
+    margin-top: 25px;
 }
 
 button {
@@ -72,10 +136,6 @@ button:hover {
     justify-content: center;
 }
 
-/* .titles h3 {
-    margin-right: 20px;
-} */
-
 .options {
     display: flex;
     position: fixed;
@@ -90,11 +150,6 @@ button:hover {
     margin-right: 20px;
     margin-bottom: 20px;
 }
-
-/* .option button {
-    inline-size: none;
-    background-color: #FFFFFF;
-} */
 
 button#import {
     background-color: #646162;
@@ -144,6 +199,7 @@ p {
     margin-top: 100px;
     display: grid;
     width: 100% !important;
+    
 }
 
 .table {
@@ -181,7 +237,8 @@ img#back {
     margin-bottom: -15px;
 }
 
-img#edit, img#rmv {
+img#edit,
+img#rmv {
     width: 15px;
     height: 15px;
 
@@ -189,6 +246,16 @@ img#edit, img#rmv {
     margin-right: 8px;
 }
 
-img#edit:hover, img#rmv:hover {
+img#edit:hover,
+img#rmv:hover {
     cursor: pointer;
+}
+
+img#add {
+    width: 25px;
+    height: 25px;
+
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
 }

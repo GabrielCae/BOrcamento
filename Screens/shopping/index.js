@@ -66,6 +66,7 @@ function isUpperCase(str) {
 window.onload = async () => {
     document.getElementById("confirm").addEventListener("click", async () => {
         localStorage.setItem("onlyView", 0)
+        localStorage.setItem("finished", 1)
         ipcRenderer.send("orcamentPDF")
         ipcRenderer.send("closeShop")
     })
@@ -76,6 +77,8 @@ window.onload = async () => {
         let infos = []
         let totalMedio = 0
         let totalMaximo = 0
+        let ipiMedio = 0
+        let ipiMax = 0
         let z = 0
 
         console.log(data)
@@ -88,16 +91,28 @@ window.onload = async () => {
                     addText("mp", data[i][j], true, z)
                     z += 1
                     addText("desc", data[i][j + 1], false)
-                    addText("rstotalmed", "R$ " + parseFloat(data[i][j + 3]).toFixed(2), false)
-                    totalMedio += parseFloat(String(data[i][j + 3]))
-                    addText("rstotalmax", "R$ " + parseFloat(data[i][j + 4]).toFixed(2), false)
-                    totalMaximo += parseFloat(String(data[i][j + 4]))
+
+                    let precoM = parseFloat(data[i][j + 3])
+                    addText("rstotalmed", "R$ " + precoM, false)
+                    totalMedio += precoM
+
+                    addText("ipimed", "R$ " + (precoM * (data[i][j + 7] / 100)).toFixed(2), false)
+                    ipiMedio += precoM * (data[i][j + 7] / 100)
+
+                    precoM = parseFloat(data[i][j + 4])
+                    addText("rstotalmax", "R$ " + precoM.toFixed(2), false)
+                    totalMaximo += precoM
+
+                    addText("ipimax", "R$ " + (precoM * (data[i][j + 7] / 100)).toFixed(2), false)
+                    ipiMax += precoM * (data[i][j + 7] / 100)
                 }
             }
         }
 
         addBr("rstotalmed")
         addBr("rstotalmax")
+        addBr("ipimed")
+        addBr("ipimax")
         addBr("desc")
         for (i = 0; i < 2; i++) {
             addBr("mp")
@@ -106,6 +121,8 @@ window.onload = async () => {
         addText("desc", "Total: ", false)
         addText("rstotalmed", "R$ " + totalMedio.toFixed(2), false)
         addText("rstotalmax", "R$ " + totalMaximo.toFixed(2), false)
+        addText("ipimed", "R$ " + ipiMedio.toFixed(2), false)
+        addText("ipimax", "R$ " + ipiMax.toFixed(2), false)
 
         document.getElementById("data").textContent = infos[1]
         document.getElementById("title").textContent = "Orçamento"

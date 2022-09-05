@@ -10,6 +10,7 @@ window.onload = async () => {
     document.querySelector("div.values").style.display = "none"
     addOption("Modificar")
     addOption("Adicionar")
+    addOption("Higienizar")
 
     try {
         const rows = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", localStorage.getItem("empresa") == "EMBAMED" ?
@@ -31,6 +32,7 @@ document.addEventListener('keydown', function (event) {
 
     if (actual == 1) importar()
     else if (actual == 2) actualizeMPValue()
+    else if (actual == 3) actualizeHigValue()
 
 })
 
@@ -48,6 +50,21 @@ function error(text) {
 
 function info(text) {
     ipcRenderer.send("showMsg", [text, "Info"])
+}
+
+async function actualizeHigValue() {
+    let value = document.getElementById("value").value
+
+    let data = []
+    try {
+        data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
+    } catch { }
+
+    data["higi"] = parseFloat(value)
+    document.getElementById("actualValueH").textContent = "Valor Atual: " + value
+
+    await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(data))
+    document.getElementById("value").value = ""
 }
 
 // Main Functions
@@ -78,7 +95,7 @@ async function actualizeMPValue() {
 
 }
 
-function loadOpt() {
+async function loadOpt() {
     let select = document.getElementById('mps');
     let selectValue = select.options[select.selectedIndex].textContent;
 
@@ -87,9 +104,12 @@ function loadOpt() {
             document.getElementById("materials").style.display = "none"
             document.querySelector("div.showContent").style.display = "grid"
             document.querySelector("div.values").style.display = "none"
+            document.getElementById("actualValueH").style.display = "none"
+            document.getElementById("name").style.display = "grid"
+            document.getElementById("lName").style.display = "grid"
 
             actual = 1
-        } else {
+        } else if (selectValue == "Modificar") {
             document.getElementById("materials").style.display = "grid"
             document.querySelector("div.showContent").style.display = "none"
             document.querySelector("div.values").style.display = "grid"
@@ -97,6 +117,21 @@ function loadOpt() {
             actual = 2
 
             document.getElementById("materials").addEventListener("change", () => loadValue())
+        } else if (selectValue == "Higienizar") {
+            document.getElementById("name").style.display = "none"
+            document.getElementById("lName").style.display = "none"
+            document.querySelector("div.values").style.display = "none"
+            document.querySelector("div.showContent").style.display = "grid"
+            document.getElementById("materials").style.display = "none"
+
+            actual = 3
+            try { data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json"))) }
+            catch { }
+
+            if (data["higi"] != undefined) {
+                document.getElementById("actualValueH").style.display = "grid"
+                document.getElementById("actualValueH").textContent = "Valor Atual: " + data["higi"]
+            }
         }
     } else {
         actual = 0
@@ -132,13 +167,13 @@ async function importar() {
                 } catch { }
             }
             name = String(name).toUpperCase()
-            data[name] = value
-            
+            data[name] = [value, false]
+
             await fs.writeFileSync(path, JSON.stringify(data))
-                info(`MP ${name} adicionada com sucesso!`)
+            info(`MP ${name} adicionada com sucesso!`)
             name.value = null
             value.value = null
-            
+
             location.reload()
             ipcRenderer.send("reloadMesa")
         } else error("Insira um valor para a MP")

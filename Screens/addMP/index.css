@@ -5,6 +5,27 @@
     text-align: center;
 }
 
+p#actualValueH{ 
+    display: none;
+}
+
+.higie {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+}
+
+input#check {
+    margin-right: -80px;
+    margin-left: -200px;
+}
+
+label#checkA {
+    margin-left: -100px;
+    margin-top: 5px;
+}
+
 .content {
     display: grid;
     justify-content: center;

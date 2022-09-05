@@ -114,7 +114,7 @@ ipcMain.on("backOpera", () => {
 ipcMain.on("closeShop", () => {
     try {
         shopping.close()
-    } catch {  }
+    } catch { }
     shopping = undefined
 })
 
@@ -205,18 +205,27 @@ ipcMain.on("searchPDF", async (event, arg) => {
     event.reply("hideContent", result)
 })
 
+ipcMain.on("higi", async (event, arg) => {
+    let options = {
+        buttons: ["Sim", "Não", "Cancelar"],
+        message: "Produto higienizado?"
+    }
+    let response = await dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), options)
+    event.reply("higiRes", response)
+})
+
 ipcMain.on("emitPDF", (event, arg) => {
     var options = {
         marginsType: 1,
-        pageSize: {
-            "width": 507993.6,
-            "height": 285800.4
-        },
+        pageSize: "A4", 
+        // {
+        //     "width": 656167, // microns
+        //     "height": 928158.3
+        // },
         printBackground: true,
         printSelectionOnly: false,
         landscape: false
     }
-
     valueChangeWin.webContents.printToPDF(options).then(async data => {
         await fs.writeFileSync(arg, data)
     }).catch(error => {
