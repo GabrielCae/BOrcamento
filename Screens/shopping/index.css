@@ -62,6 +62,7 @@ button:hover {
 }
 
 .termedic img {
+    cursor: normal;
     margin-left: 20px;
     margin-bottom: 13px;
     align-items: center;

@@ -148,7 +148,7 @@ async function loadValue() {
     let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", localStorage.getItem("empresa") == "EMBAMED" ?
         "mpEmb.json" : "mpTerm.json")))
 
-    document.getElementById("actualValue").textContent = "Valor Atual: " + preco[selectValue]
+    document.getElementById("actualValue").textContent = "Valor Atual: " + preco[selectValue][0]
 }
 
 async function importar() {

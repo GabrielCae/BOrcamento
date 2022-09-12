@@ -71,6 +71,13 @@ async function addBr(id) {
     document.getElementById(id).appendChild(p)
 }
 
+function objectNull(obj) {
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) return false;
+    }
+    return true;
+}
+
 function importar() {
     ipcRenderer.send("importar", "report")
 }
@@ -104,7 +111,8 @@ window.onload = async () => {
     })
     document.getElementById("help").addEventListener("click",
         () => info("Monte uma planilha com o seguinte formato: \n\nCentro de Custo (Coluna A) - Valor (Coluna B)"))
-    if (!fs.existsSync(join(__dirname, "..", "..", "cc.json"))) {
+    if (!fs.existsSync(join(__dirname, "..", "..", "cc.json")) ||
+        objectNull(JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "cc.json"))))) {
         document.querySelector("table.table").style.display = "none"
         document.getElementById("title").textContent = "Importe os Centro de Custos"
     } else {

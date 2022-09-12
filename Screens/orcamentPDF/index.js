@@ -193,6 +193,12 @@ window.onload = async () => {
             addBr("id")
         }
 
+        let linha = document.createElement("p")
+        linha.textContent = ""
+        linha.id = "linha"
+        linha.style.marginTop = "50px"
+        document.getElementById("desc").appendChild(linha)
+
         addText("desc", "Total: ", false)
         addText("rstotalmed", "R$ " + totalMedio.toFixed(2), false)
         addText("rstotalmax", "R$ " + totalMaximo.toFixed(2), false)
@@ -278,6 +284,11 @@ window.onload = async () => {
 
             // console.log(Array(operations).push("AA"))
         }
+
+        let linha = document.createElement("p")
+        linha.textContent = ""
+        linha.id = "linha"
+        document.getElementById("desc").appendChild(linha)
 
         // console.log(totalMedio, totalMaximo)
         addBr("rstotalmed")

@@ -4,7 +4,7 @@ const {
     BrowserWindow,
     ipcMain,
     dialog,
-    ipcRenderer,
+    globalShortcut
 } = require('electron')
 const { join, basename } = require('path')
 const fs = require("fs")
@@ -22,20 +22,28 @@ app.on("ready", () => {
         width: 1460,
         height: 1000,
         center: true,
-        autoHideMenuBar: true,
-        show: false,
+        show: true,
         maximizable: true,
+        autoHideMenuBar: true,
         icon: join(__dirname, "assets/icon.png"),
         webPreferences: {
-            contextIsolation: false,
             nodeIntegration: true,
-            enableRemoteModule: true,
-        }
+        },
     })
 
     // mainWin.focus()
+    globalShortcut.register('CmdOrCtrl+=', () => {
+        try {
+            BrowserWindow.getFocusedWindow().webContents.setZoomLevel(
+                BrowserWindow.getFocusedWindow().webContents.getZoomLevel() + 0.5
+            )
+        } catch { }
+    })
+    mainWin.webContents.setZoomFactor(1, 5)
+    mainWin.webContents.setZoomLevel(5.0)
+
     mainWin.loadFile(join(__dirname, "Screens", "main", "index.html"))
-    mainWin.once("ready-to-show", () => mainWin.show())
+    // mainWin.once("ready-to-show", () => mainWin.show())
 })
 
 // --- Ipc Events ---
@@ -217,7 +225,7 @@ ipcMain.on("higi", async (event, arg) => {
 ipcMain.on("emitPDF", (event, arg) => {
     var options = {
         marginsType: 1,
-        pageSize: "A4", 
+        pageSize: "A4",
         // {
         //     "width": 656167, // microns
         //     "height": 928158.3

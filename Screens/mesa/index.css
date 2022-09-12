@@ -7,6 +7,24 @@
     font-size: 15px;
 }
 
+.higi {
+    font-size: 25px;
+    display: block;
+    width: 400px;
+    margin-left: 200px;
+    margin-top: 25px;
+}
+
+.higi input {
+    width: 16px;
+    height: 16px;
+    margin-right: -12px;
+    vertical-align: middle;
+    position: relative;
+    text-align: justify;
+    margin-top: 20px;
+}
+
 .selectDiv {
     display: flex;
     align-items: center;
@@ -30,6 +48,10 @@ h1 {
 
 .inputs p {
     margin-top: 88px;
+}
+
+img#termedic:hover {
+    cursor: default;
 }
 
 .inputs2 {
@@ -120,6 +142,7 @@ img#back {
 }
 
 button {
+    position: fixed;
     background-color: #646162;
 
     border-color: transparent;
@@ -155,7 +178,8 @@ img#right {
     cursor: pointer;
 }
 
-.inputs input, p {
+.inputs input,
+p {
     margin-right: 2px;
     margin-left: 2px;
     margin-bottom: -15px;

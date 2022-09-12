@@ -56,7 +56,29 @@ h3#title {
     width: 85%;
 
     padding: .5em 0;
-	border-bottom: 2px dashed rgb(136, 134, 134);
+    border-bottom: 2px dashed rgb(136, 134, 134);
+}
+
+#linha {
+    width: 85%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 90px;
+    
+    /* top: 290px; */
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+
+    color: #FFFF;
+
+    position: fixed;
+
+    padding: .5em 0;
+    border-bottom: 2px dashed rgb(136, 134, 134);
 }
 
 h3#sin {
@@ -199,7 +221,7 @@ p {
     margin-top: 100px;
     display: grid;
     width: 100% !important;
-    
+
 }
 
 .table {

@@ -1,6 +1,7 @@
-const { ipcRenderer, dialog, BrowserWindow } = require("electron")
+const { ipcRenderer } = require("electron")
 const fs = require("fs")
 const { join } = require("path")
+const electron = require('electron')
 
 let mp
 let name
@@ -14,6 +15,7 @@ window.onload = async () => {
     document.getElementById("l1").style.display = "none"
     document.getElementById("l2").style.display = "none"
     document.getElementById("cav").style.display = "none"
+    document.getElementById("higie").style.display = "none"
     document.getElementById("info").textContent = ""
     document.getElementById("rmv").addEventListener("click", () => removeMP())
 
@@ -57,7 +59,7 @@ window.onload = async () => {
                 data[0][className + 7],
             ]
         }
-        // console.log(data)
+        console.log(data)
 
         let select = document.getElementById("materials")
         let options = [...select.options]
@@ -92,27 +94,13 @@ window.onload = async () => {
 
         i = 0
         inputs.forEach(input => {
-            // console.log(i)
             if (input.style.display != "none") {
-                input.value = values[i]
+                if (values[i] == "true") document.getElementById("hii").checked = true
+                else input.value = values[i]
                 i++
             }
         })
     }
-
-    ipcRenderer.on("higiRes", (event, arg) => {
-        console.log(arg)
-        if (arg == 0) localStorage.setItem("higie", true)
-        else if (arg == 1) localStorage.setItem("higie", false)
-
-        if (arg != 2) {
-            localStorage.setItem("mpSelected", mp)
-            localStorage.setItem("opt", name)
-            localStorage.setItem("infos", infos)
-            ipcRenderer.send("operations")
-        }
-    })
-
     let infos = []
     document.getElementById("right").addEventListener("click", async () => {
         let inputs = document.querySelectorAll("input");
@@ -121,12 +109,20 @@ window.onload = async () => {
             if (i.style.display != "none") {
                 if (i.value != 0 && i.value != "") {
                     show = true
-                    infos.push(i.value)
+                    if (i.id == "hii") infos.push(i.checked)
+                    else infos.push(i.value)
                 }
                 else show = false
             }
         })
-        if (show) ipcRenderer.send("higi")
+        if (show) {
+            localStorage.setItem("higie", document.getElementById("hii").checked)
+
+            localStorage.setItem("mpSelected", mp)
+            localStorage.setItem("opt", name)
+            localStorage.setItem("infos", infos)
+            ipcRenderer.send("operations")
+        }
         else error("Preencha todas as informações!")
     })
 
@@ -134,7 +130,7 @@ window.onload = async () => {
         let inputs = document.querySelectorAll("input");
         let show = false
         inputs.forEach(i => {
-            if (i.style.display != "none") {
+            if (i.style.display != "none" && i.id != "hii") {
                 if (i.value != 0 && i.value != "") {
                     show = true
                 }
@@ -260,6 +256,7 @@ function addOptions() {
     document.getElementById("l1").style.display = "none"
     document.getElementById("l2").style.display = "none"
     document.getElementById("cav").style.display = "none"
+    document.getElementById("higie").style.display = "none"
     let rows = []
 
     if (document.getElementById("options")[1] != undefined) {
@@ -299,6 +296,8 @@ function adjustInputs() {
         document.getElementById("l1").value = 420
         document.getElementsByName('l1')[0].placeholder = 'Lado 1 em mm'
         document.getElementsByName('l2')[0].placeholder = 'Lado 2 em mm'
+        document.getElementById("higie").style.marginTop = "-20px"
+        document.getElementById("higie").style.marginBottom = "-24px"
     } else if (String(mp).startsWith("EVA")) {
         document.getElementById("cav").style.display = "none"
         document.getElementById("bob").style.display = "none"
@@ -311,6 +310,8 @@ function adjustInputs() {
         document.getElementsByName('l1')[0].placeholder = 'Largura'
         document.getElementsByName('l2')[0].placeholder = 'Comprimento'
     }
+
+    document.getElementById("higie").style.display = "block"
 
 }
 
