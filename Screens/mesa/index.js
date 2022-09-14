@@ -1,7 +1,6 @@
 const { ipcRenderer } = require("electron")
 const fs = require("fs")
 const { join } = require("path")
-const electron = require('electron')
 
 let mp
 let name
@@ -103,27 +102,34 @@ window.onload = async () => {
     }
     let infos = []
     document.getElementById("right").addEventListener("click", async () => {
-        let inputs = document.querySelectorAll("input");
-        let show = false
-        inputs.forEach(i => {
-            if (i.style.display != "none") {
-                if (i.value != 0 && i.value != "") {
-                    show = true
-                    if (i.id == "hii") infos.push(i.checked)
-                    else infos.push(i.value)
-                }
-                else show = false
-            }
-        })
-        if (show) {
-            localStorage.setItem("higie", document.getElementById("hii").checked)
+        let select = document.getElementById('materials');
+        let selectValue = select.options[select.selectedIndex].textContent;
 
-            localStorage.setItem("mpSelected", mp)
-            localStorage.setItem("opt", name)
-            localStorage.setItem("infos", infos)
-            ipcRenderer.send("operations")
-        }
-        else error("Preencha todas as informações!")
+        let selectO = document.getElementById('options');
+        let selectValueO = selectO.options[selectO.selectedIndex].textContent;
+        if (selectValue != "" && selectValueO != "") {
+            let inputs = document.querySelectorAll("input");
+            let show = false
+            inputs.forEach(i => {
+                if (i.style.display != "none" && i.id != "hii") {
+                    if (i.value != 0 && i.value != "") {
+                        show = true
+                        if (i.id == "hii") infos.push(i.checked)
+                        else infos.push(i.value)
+                    }
+                    else show = false
+                }
+            })
+            if (show) {
+                localStorage.setItem("higie", document.getElementById("hii").checked)
+
+                localStorage.setItem("mpSelected", mp)
+                localStorage.setItem("opt", name)
+                localStorage.setItem("infos", infos)
+                ipcRenderer.send("operations")
+            } else error("Preencha todas as informações!")
+
+        } else error("Preencha todas as informações!")
     })
 
     setInterval(() => {
@@ -334,6 +340,7 @@ async function showOpts() {
     } else document.getElementById("options").style.display = "none"
 }
 
-function addMP() {
+function modify (e) {
     ipcRenderer.send("importInfo")
+    localStorage.setItem("whatDo", e)
 }

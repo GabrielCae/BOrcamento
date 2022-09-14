@@ -5,12 +5,23 @@ const { join } = require("path");
 // DOM load
 
 window.onload = async () => {
+    document.getElementById("title").textContent = localStorage.getItem("whatDo") == "a" ?
+        "Adicionar MP" : localStorage.getItem("whatDo") == "m" ? "Modificar MP" : "Modificar preço da Higienização"
+
+    try {
+        let info = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
+        let j = 0
+        
+        for (i in info) {
+            j++
+        }
+
+        if (j == 0) await fs.unlinkSync(join(__dirname, "..", "..", "config.json"))
+    } catch { }
+
     document.querySelector("div.showContent").style.display = "none"
     document.getElementById("materials").style.display = "none"
     document.querySelector("div.values").style.display = "none"
-    addOption("Modificar")
-    addOption("Adicionar")
-    addOption("Higienizar")
 
     try {
         const rows = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", localStorage.getItem("empresa") == "EMBAMED" ?
@@ -21,24 +32,25 @@ window.onload = async () => {
         }
     } catch { }
 
-    document.getElementById("mps").addEventListener("change", () => loadOpt())
+    loadOpt()
+
+    document.getElementById("confirm").addEventListener("click", () => done())
 
     document.getElementById("info").textContent = localStorage.getItem("empresa") == "EMBAMED" ?
         "Simples Nacional" : "Lucro Presumido"
 }
 
-document.addEventListener('keydown', function (event) {
-    if (event.keyCode !== 13) return;
+function done() {
+    if (actual == 0) return
 
     if (actual == 1) importar()
     else if (actual == 2) actualizeMPValue()
     else if (actual == 3) actualizeHigValue()
-
-})
+}
 
 // Auxiliar Functions
 
-function addOption(txt, id = "mps") {
+function addOption(txt, id) {
     let opt = document.createElement("option")
     opt.textContent = txt
     document.getElementById(id).appendChild(opt)
@@ -55,16 +67,27 @@ function info(text) {
 async function actualizeHigValue() {
     let value = document.getElementById("value").value
 
-    let data = []
+    let data = {}
     try {
         data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
     } catch { }
 
-    data["higi"] = parseFloat(value)
-    document.getElementById("actualValueH").textContent = "Valor Atual: " + value
+    try {
+        data["higi"] = parseFloat(value)
+        document.getElementById("actualValueH").textContent = "Valor Atual: R$ " + value
+        console.log(data)
 
-    await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(data))
-    document.getElementById("value").value = ""
+        await fs.writeFileSync(join(__dirname, "..", "..", "config.json"), JSON.stringify(data))
+        document.getElementById("value").value = ""
+        
+        info(`Preço ${data["higi"] == undefined ? "cadastrado" : "atualizado"} com sucesso`)
+        location.reload()
+    } catch (err) {
+        console.log(err)
+        error(
+            `Houve uma falha ao tentar ${data["higi"] == undefined ? "cadastrar" : "atualizar"} o preço da Higienização, tente novamente.`
+        )
+    }
 }
 
 // Main Functions
@@ -80,9 +103,9 @@ async function actualizeMPValue() {
                 "mpEmb.json" : "mpTerm.json")
 
             let preco = JSON.parse(await fs.readFileSync(path))
-            preco[selectValue] = newValueInput.value
+            preco[selectValue] = [newValueInput.value, preco[selectValue][1]]
 
-            info(`Valor atualizado com sucesso! ${selectValue}: ${newValueInput.value}`)
+            info(`Valor atualizado com sucesso! ${selectValue}: R$ ${newValueInput.value}`)
 
             await fs.writeFileSync(path, JSON.stringify(preco))
 
@@ -96,8 +119,9 @@ async function actualizeMPValue() {
 }
 
 async function loadOpt() {
-    let select = document.getElementById('mps');
-    let selectValue = select.options[select.selectedIndex].textContent;
+    let selectValue = localStorage.getItem("whatDo") == "a" ?
+        "Adicionar" : localStorage.getItem("whatDo") == "m" ? "Modificar" : "Higienizar"
+    console.log(selectValue)
 
     if (selectValue != "") {
         if (selectValue == "Adicionar") {
@@ -125,12 +149,13 @@ async function loadOpt() {
             document.getElementById("materials").style.display = "none"
 
             actual = 3
+            let data = {}
             try { data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json"))) }
             catch { }
 
             if (data["higi"] != undefined) {
                 document.getElementById("actualValueH").style.display = "grid"
-                document.getElementById("actualValueH").textContent = "Valor Atual: " + data["higi"]
+                document.getElementById("actualValueH").textContent = "Valor Atual: R$ " + data["higi"]
             }
         }
     } else {
@@ -145,10 +170,12 @@ async function loadOpt() {
 async function loadValue() {
     let select = document.getElementById('materials');
     let selectValue = select.options[select.selectedIndex].textContent;
-    let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", localStorage.getItem("empresa") == "EMBAMED" ?
-        "mpEmb.json" : "mpTerm.json")))
+    let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..",
+        localStorage.getItem("empresa") == "EMBAMED" ? "mpEmb.json" : "mpTerm.json")))
 
-    document.getElementById("actualValue").textContent = "Valor Atual: " + preco[selectValue][0]
+    console.log(preco[selectValue][0])
+
+    document.getElementById("actualValue").textContent = "Valor Atual: R$ " + preco[selectValue][0]
 }
 
 async function importar() {

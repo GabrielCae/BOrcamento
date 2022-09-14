@@ -40,7 +40,6 @@ app.on("ready", () => {
         } catch { }
     })
     mainWin.webContents.setZoomFactor(1, 5)
-    mainWin.webContents.setZoomLevel(5.0)
 
     mainWin.loadFile(join(__dirname, "Screens", "main", "index.html"))
     // mainWin.once("ready-to-show", () => mainWin.show())

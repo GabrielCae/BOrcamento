@@ -16,6 +16,18 @@ p#actualValueH{
     text-align: center;
 }
 
+img#confirm {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    bottom: 20px;
+    right: 20px;
+}
+
+img#confirm:hover {
+    cursor: pointer;
+}
+
 input#check {
     margin-right: -80px;
     margin-left: -200px;

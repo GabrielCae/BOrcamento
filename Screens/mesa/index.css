@@ -1,3 +1,7 @@
+body {
+    overflow-x: hidden;
+}
+
 .content {
     display: grid;
     justify-content: center;
@@ -5,6 +9,23 @@
     text-align: center;
     margin-bottom: 15px;
     font-size: 15px;
+}
+
+.buttons {
+    display: grid;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center;
+    /* width: 100%; */
+    
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    margin-bottom: 20px;
+}
+
+button {
+    margin-bottom: 20px;
 }
 
 .higi {
@@ -142,7 +163,6 @@ img#back {
 }
 
 button {
-    position: fixed;
     background-color: #646162;
 
     border-color: transparent;
@@ -157,11 +177,6 @@ button {
     font-weight: 400;
 
     transition: opacity 0.9s;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    margin-bottom: 20px;
-    margin-left: 20px;
     color: #FFFFFF;
 }
 
@@ -175,6 +190,9 @@ img#right {
     position: absolute;
     bottom: 20px;
     right: 25px;
+}
+
+img#right:hover {
     cursor: pointer;
 }
 

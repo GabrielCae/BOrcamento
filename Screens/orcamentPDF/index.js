@@ -114,6 +114,14 @@ ipcRenderer.on("hideContent", (event, arg) => {
     if (arg != undefined) {
         document.getElementById("pdf").style.display = "none"
 
+        let img = document.querySelectorAll("img");
+        img.forEach(i => {
+            if (i.id == "rmv" || i.id == "edit") {
+                console.log(i)
+                i.style.display = "none"
+            }
+        })
+
         document.getElementById("rmv").style.display = "none"
         document.getElementById("edit").style.display = "none"
 
@@ -126,6 +134,15 @@ ipcRenderer.on("showContent", () => {
         "PDF Gerado com sucesso!",
         "info"
     ])
+
+    let img = document.querySelectorAll("img");
+    img.forEach(i => {
+        if (i.id == "rmv" || i.id == "edit") {
+            console.log(i)
+            i.style.display = "flex"
+        }
+    })
+
     document.getElementById("pdf").style.display = "grid"
     document.getElementById("rmv").style.display = "flex"
     document.getElementById("edit").style.display = "flex"

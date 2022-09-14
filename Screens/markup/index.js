@@ -225,7 +225,6 @@ window.onload = async () => {
             await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
                 JSON.stringify(data))
         } else {
-            await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
             ipcRenderer.send("backMain")
         }
     })
