@@ -1,4 +1,4 @@
-const { ipcRenderer } = require("electron")
+const { ipcRenderer, ipcMain } = require("electron")
 const fs = require("fs")
 const { join } = require("path")
 
@@ -19,7 +19,15 @@ window.onload = async () => {
     document.getElementById("rmv").addEventListener("click", () => removeMP())
 
     try {
-        const rows = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", localStorage.getItem("empresa") == "EMBAMED" ?
+        let empresa = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))["empresa"]
+        localStorage.setItem("empresa", empresa)
+        console.log(empresa)
+
+        // if (empresa == undefined) empresa = localStorage.getItem("empresa")
+        // else if (localStorage.getItem("empresa") != empresa)
+        //     localStorage.setItem("empresa", empresa)
+
+        const rows = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", empresa == "EMBAMED" ?
             "mpEmb.json" : "mpTerm.json")))
 
         for (i in rows) {
@@ -340,7 +348,7 @@ async function showOpts() {
     } else document.getElementById("options").style.display = "none"
 }
 
-function modify (e) {
-    ipcRenderer.send("importInfo")
+function modify(e) {
+    ipcRenderer.send("importInfo", e)
     localStorage.setItem("whatDo", e)
 }

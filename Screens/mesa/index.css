@@ -21,10 +21,9 @@ body {
     position: absolute;
     bottom: 20px;
     left: 20px;
-    margin-bottom: 20px;
 }
 
-button {
+button#addMP, button#modifyMP {
     margin-bottom: 20px;
 }
 

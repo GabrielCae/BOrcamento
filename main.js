@@ -4,7 +4,8 @@ const {
     BrowserWindow,
     ipcMain,
     dialog,
-    globalShortcut
+    globalShortcut,
+    Menu
 } = require('electron')
 const { join, basename } = require('path')
 const fs = require("fs")
@@ -14,24 +15,145 @@ let mainWin
 let valueChangeWin
 let historyOrc
 let shopping
+let empresa = ""
+
+let options = {
+    buttons: ["Mudar", "Cancelar"],
+    message: "Tem certeza que deseja mudar a empresa?\nObs: O Trabalho não salvo será perdido"
+}
+
+let options2 = {
+    buttons: ["Sim", "Não"],
+    message: "Tem certeza que deseja começar um novo orçamento?"
+}
+
+let options3 = {
+    buttons: ["Sim", "Não"],
+    message: "Tem certeza que deseja importar as operações agora?\nObs: O Trabalho não salvo será perdido"
+}
 
 // --- Main Application ---
+app.on("ready", (event) => {
 
-app.on("ready", () => {
+    //--- Create Window ---
     mainWin = new BrowserWindow({
         width: 1460,
         height: 1000,
         center: true,
         show: true,
         maximizable: true,
-        autoHideMenuBar: true,
         icon: join(__dirname, "assets/icon.png"),
         webPreferences: {
             nodeIntegration: true,
         },
     })
 
-    // mainWin.focus()
+    //--- Menu ---
+    const mainMenuTemplate = [
+        {
+            label: 'Empresa',
+            submenu: [
+                {
+                    label: 'TERMEDIC', async click() {
+                        if (empresa != "TERMEDIC") {
+                            let response = await dialog.showMessageBoxSync(options)
+
+                            if (response == 0) ipcMain.emit("termeOrc")
+                        }
+                    }
+                },
+                {
+                    label: 'EMBAMED', async click() {
+                        if (empresa != "EMBAMED") {
+                            let response = await dialog.showMessageBoxSync(options)
+
+                            if (response == 0) ipcMain.emit("embamOrc")
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            label: 'Cadastro',
+            submenu: [
+                {
+                    label: 'MATÉRIA PRIMA',
+                    submenu: [
+                        {
+                            label: 'ADICIONAR', async click() {
+                                await mainWin.webContents.executeJavaScript(`ipcRenderer.send("importInfo", "a")`)
+                            }
+                        },
+                        {
+                            label: 'MODIFICAR', async click() {
+                                await mainWin.webContents.executeJavaScript(`ipcRenderer.send("importInfo", "m")`)
+                            }
+                        }
+                    ]
+                },
+                {
+                    label: 'CENTRO DE CUSTO',
+                },
+                {
+                    label: 'PROCESSOS', async click() {
+                        let response = await dialog.showMessageBoxSync(options3)
+
+                        if (response == 0) {
+                            await mainWin.webContents.executeJavaScript("ipcRenderer.send('operations')")
+
+                            await mainWin.webContents.executeJavaScript(`ipcRenderer.send("importar", "opera")`)
+                            await mainWin.webContents.executeJavaScript(`ipcRenderer.send("back")`)
+                            await mainWin.webContents.executeJavaScript(`ipcRenderer.send("showMsg", ["Operações importadas com sucesso!", "Info"])`)
+                        }
+                    }
+                },
+                {
+                    label: 'SERVIÇOS',
+                    submenu: [
+                        {
+                            label: 'Higienização', async click() {
+                                await mainWin.webContents.executeJavaScript(`ipcRenderer.send("importInfo", "h")`)
+                            }
+                        }
+                    ]
+                },
+                {
+                    label: 'CLIENTES',
+                }
+            ]
+        },
+        {
+            label: 'Orçamento',
+            submenu: [
+                {
+                    label: 'NOVO', async click() {
+                        let response = await dialog.showMessageBoxSync(options2)
+
+                        if (response == 0) {
+                            try {
+                                await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
+                            }
+                            catch { }
+
+                            await mainWin.webContents.executeJavaScript(`localStorage.setItem("editItem", 0)`)
+                            await mainWin.webContents.executeJavaScript(`ipcRenderer.send("backTo")`)
+                        }
+                    }
+                },
+                {
+                    label: 'HISTÓRICO', async click() {
+                        await mainWin.webContents.executeJavaScript(`ipcRenderer.send("historyOrc")`)
+                    }
+                }
+            ]
+        }
+    ];
+    const mainMenu = Menu.buildFromTemplate(mainMenuTemplate);
+    Menu.setApplicationMenu(mainMenu);
+
+    mainWin.webContents.openDevTools()
+
+    //--- Shortcuts ---
     globalShortcut.register('CmdOrCtrl+=', () => {
         try {
             BrowserWindow.getFocusedWindow().webContents.setZoomLevel(
@@ -39,18 +161,51 @@ app.on("ready", () => {
             )
         } catch { }
     })
-    mainWin.webContents.setZoomFactor(1, 5)
 
+    globalShortcut.register('CmdOrCtrl+-', () => {
+        try {
+            BrowserWindow.getFocusedWindow().webContents.setZoomLevel(
+                BrowserWindow.getFocusedWindow().webContents.getZoomLevel() - 0.5
+            )
+        } catch { }
+    })
+
+    //--- Load Content ---
+    mainWin.webContents.setZoomFactor(1, 5)
     mainWin.loadFile(join(__dirname, "Screens", "main", "index.html"))
-    // mainWin.once("ready-to-show", () => mainWin.show())
 })
 
 // --- Ipc Events ---
-ipcMain.on("newOrc", () => {
-    mainWin.loadFile(join(__dirname, "Screens", "EorT", "index.html"))
+ipcMain.on('getEmpresa', async (event) => {
+    try {
+        let info = JSON.parse(await fs.readFileSync(join(__dirname, "config.json")))
+        let j = 0
+
+        for (i in info) j++
+
+        if (j == 0) await fs.unlinkSync(join(__dirname, "config.json"))
+    } catch { }
+
+    let data
+    if (fs.existsSync(join(__dirname, "config.json"))) data = JSON.parse(await fs.readFileSync(join(__dirname, "config.json")))
+    data["empresa"] = empresa
+    await fs.writeFileSync(join(__dirname, "config.json"), JSON.stringify(data))
 })
 
-ipcMain.on("termeOrc", () => {
+ipcMain.on("newOrc", () => {
+    mainWin.loadFile(join(__dirname, "Screens", "main", "index.html"))
+})
+
+ipcMain.on("termeOrc", async () => {
+    let data
+
+    if (fs.existsSync(join(__dirname, "config.json")))
+        data = JSON.parse(await fs.readFileSync(join(__dirname, "config.json")))
+
+    data["empresa"] = "TERMEDIC"
+    empresa = "TERMEDIC"
+    await fs.writeFileSync(join(__dirname, "config.json"), JSON.stringify(data))
+
     mainWin.loadFile(join(__dirname, "Screens", "mesa", "index.html"))
 })
 
@@ -125,7 +280,16 @@ ipcMain.on("closeShop", () => {
     shopping = undefined
 })
 
-ipcMain.on("embamOrc", () => {
+ipcMain.on("embamOrc", async () => {
+    let data
+
+    if (fs.existsSync(join(__dirname, "config.json")))
+        data = JSON.parse(await fs.readFileSync(join(__dirname, "config.json")))
+
+    data["empresa"] = "EMBAMED"
+    empresa = "EMBAMED"
+    await fs.writeFileSync(join(__dirname, "config.json"), JSON.stringify(data))
+
     mainWin.loadFile(join(__dirname, "Screens", "mesa", "index.html"))
 })
 
@@ -161,7 +325,7 @@ ipcMain.on("orcamentPDF", async () => {
     valueChangeWin.loadFile(join(__dirname, "Screens", "orcamentPDF", "index.html"))
 })
 
-ipcMain.on("importInfo", async () => {
+ipcMain.on("importInfo", async (event, args) => {
     if (valueChangeWin == undefined) {
         valueChangeWin = new BrowserWindow({
             width: 1080,
@@ -177,6 +341,9 @@ ipcMain.on("importInfo", async () => {
         })
         valueChangeWin.on("close", () => valueChangeWin = undefined)
     } else valueChangeWin.focus()
+
+    valueChangeWin.webContents.openDevTools()
+    await mainWin.webContents.executeJavaScript(`localStorage.setItem('whatDo', "${args}")`)
 
     valueChangeWin.loadFile(join(__dirname, "Screens", "addMP", "index.html"))
 })
@@ -288,7 +455,7 @@ ipcMain.on("markupScreen", () => {
 })
 
 ipcMain.on("back", () => {
-    mainWin.loadFile(join(__dirname, "Screens", "EorT", "index.html"))
+    mainWin.loadFile(join(__dirname, "Screens", "main", "index.html"))
 })
 
 ipcMain.on("backMain", () => {

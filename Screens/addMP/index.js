@@ -5,6 +5,7 @@ const { join } = require("path");
 // DOM load
 
 window.onload = async () => {
+    console.log(localStorage.getItem("whatDo"))
     document.getElementById("title").textContent = localStorage.getItem("whatDo") == "a" ?
         "Adicionar MP" : localStorage.getItem("whatDo") == "m" ? "Modificar MP" : "Modificar preço da Higienização"
 
@@ -12,9 +13,7 @@ window.onload = async () => {
         let info = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
         let j = 0
         
-        for (i in info) {
-            j++
-        }
+        for (i in info) j++
 
         if (j == 0) await fs.unlinkSync(join(__dirname, "..", "..", "config.json"))
     } catch { }

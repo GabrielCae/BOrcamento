@@ -147,7 +147,6 @@ ipcRenderer.on("operaData", async (event, arg) => {
         h.setSeconds(+opera[i][3] * 3600)
         opera[i][5] = h.toTimeString().slice(0, 8)
     }
-    console.log(opera)
     await fs.writeFileSync(join(__dirname, "..", "..", "operacoes.json"), JSON.stringify(opera))
     location.reload()
 })
