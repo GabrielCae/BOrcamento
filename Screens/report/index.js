@@ -12,7 +12,6 @@ async function getCC(opera) {
 async function getValueCC(cc) {
     let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "cc.json")))
 
-    // console.log(data[cc])
     return data[cc]
 }
 
@@ -28,8 +27,8 @@ async function tempo(opera, nmax, dec = false) {
     }
 }
 
-function perform() {
-    return localStorage.getItem("operations").split(",")
+function perform(info = "operations") {
+    return localStorage.getItem(info).split(",")
 }
 
 async function addText(id, text, mod = false, personalizedClass = false, classP = "") {
@@ -90,7 +89,6 @@ ipcRenderer.on("reportData", async (event, arg) => {
         }
     })
 
-    // console.log(cc)
     await fs.writeFileSync(join(__dirname, "..", "..", "cc.json"), JSON.stringify(cc))
     location.reload()
 
@@ -104,10 +102,12 @@ let totalMedio = 0
 let totalMaximo = 0
 
 window.onload = async () => {
+    document.title = "Preview - " + localStorage.getItem("empresa")
+
     document.getElementById("continue").addEventListener("click", () => ipcRenderer.send("markupScreen"))
 
     document.getElementById("back").addEventListener("click", async () => {
-        ipcRenderer.send("backOpera")
+        ipcRenderer.send("chooseSer")
     })
     document.getElementById("help").addEventListener("click",
         () => info("Monte uma planilha com o seguinte formato: \n\nCentro de Custo (Coluna A) - Valor (Coluna B)"))
@@ -116,134 +116,141 @@ window.onload = async () => {
         document.querySelector("table.table").style.display = "none"
         document.getElementById("title").textContent = "Importe os Centro de Custos"
     } else {
-        document.getElementById("import").style.display = "none"
-        document.getElementById("help").style.display = "none"
-        let operations = perform()
 
-        // MP
-        let totalMP = 0
+        try {
+            document.getElementById("import").style.display = "none"
+            document.getElementById("help").style.display = "none"
+            let operations = perform()
+            let services = perform("services")
 
-        await addText("mp", localStorage.getItem("mpSelected"))
-        await addText("desc", localStorage.getItem("opt"))
-        let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..",
-            localStorage.getItem("empresa") == "EMBAMED" ?
-                "mpEmb.json" : "mpTerm.json")))
-        await addText("rsuni", String("R$ " + parseFloat(preco[localStorage.getItem("mpSelected")][0]).toFixed(2))
-            .replace(".", ","))
-        await addText("unid", "kg")
-        await addText("qtde", String(parseFloat(localStorage.getItem("info").split(",")[1]).toFixed(4))
-            .replace(".", ","), false)
-        await addBr("conj")
-        await addBr("conj")
-        totalMP = parseFloat(preco[localStorage.getItem("mpSelected")][0] *
-            parseFloat(localStorage.getItem("qtde")).toFixed(4)) * 1
-        await addText("rstotal", "R$ " + String(totalMP.toFixed(2)).replace(".", ","))
+            // MP
+            let totalMP = 0
 
-        console.log(localStorage.getItem("higie"))
-        if (localStorage.getItem("higie") == "true") {
-            let config = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))
-            console.log(config["higi"], config)
-
-            await addBr("mp")
-            await addText("desc", "Higienização")
-            await addBr("rsuni", String("R$ " + parseFloat(config["higi"]).toFixed(2)).replace(".", ","))
-            await addBr("unid")
-            await addBr("qtde")
+            await addText("mp", localStorage.getItem("mpSelected"))
+            await addText("desc", localStorage.getItem("opt"))
+            let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..",
+                localStorage.getItem("empresa") == "EMBAMED" ?
+                    "mpEmb.json" : "mpTerm.json")))
+            await addText("rsuni", String("R$ " + parseFloat(preco[localStorage.getItem("mpSelected")][0]).toFixed(2))
+                .replace(".", ","))
+            await addText("unid", "kg")
+            await addText("qtde", String(parseFloat(localStorage.getItem("info").split(",")[1]).toFixed(4))
+                .replace(".", ","), false)
             await addBr("conj")
-            totalMP += parseFloat(config["higi"])
-            await addText("rstotal", "R$ " + String(parseFloat(config["higi"]).toFixed(2)).replace(".", ","))
-        }
+            await addBr("conj")
+            totalMP = parseFloat(preco[localStorage.getItem("mpSelected")][0] *
+                parseFloat(localStorage.getItem("qtde")).toFixed(4)) * 1
+            await addText("rstotal", "R$ " + String(totalMP.toFixed(2)).replace(".", ","))
 
-        // espaçamento
+            if (services[0] != "") {
+                let path = join(__dirname, "..", "..", localStorage.getItem("empresa") == "EMBAMED" ?
+                    "servicesEmb.json" : "servicesTerm.json")
 
-        addText("conj", "Total MP:")
-        addText("rstotal", "R$ " + String(totalMP.toFixed(2)).replace(".", ","))
-        for (i = 0; i < 1; i++) {
-            addBr("mp")
-            addBr("desc")
-            addBr("rsuni")
-            addBr("unid")
-            addBr("qtde")
-        }
+                let config = JSON.parse(await fs.readFileSync(path))
+                for (i in config) {
+                    if (services.includes(i)) {
+                        console.log(i)
+                        await addBr("mp")
+                        await addText("desc", i)
+                        await addBr("rsuni", String("R$ " + parseFloat(config[i]).toFixed(2)).replace(".", ","))
+                        await addBr("unid")
+                        await addBr("qtde")
+                        await addBr("conj")
+                        totalMP += parseFloat(config[i])
+                        await addText("rstotal", "R$ " + String(parseFloat(config[i]).toFixed(2)).replace(".", ","))
 
-        // OPERATIONS
+                    }
+                }
+                // console.log(config["higi"], config)
+            }
 
-        addTitle("mp", "Operações", "opera")
-        addTitle("desc", "Centro de Custos", "cc")
-        addTitle("unid", "Média Hora", "hour")
-        addTitle("qtde", "Hora Máxima", "hourM")
-        addTitle("rsuni", "Taxa Hora MOD", "taxa")
-        addTitle("conj", "Custo Médio", "medio")
-        addTitle("rstotal", "Custo Máximo", "max")
+            // espaçamento
 
-        // console.log(localStorage.getItem("info"))
+            addText("conj", "Total MP:")
+            addText("rstotal", "R$ " + String(totalMP.toFixed(2)).replace(".", ","))
+            for (i = 0; i < 1; i++) {
+                addBr("mp")
+                addBr("desc")
+                addBr("rsuni")
+                addBr("unid")
+                addBr("qtde")
+            }
 
-        operations = operations.sort()
-        for (i in operations) {
-            addText("opera", String(operations[i]).split(" - ")[0])
-            addText("cc", await getCC(operations[i]))
-            addText("hour", await tempo(operations[i], true))
-            addText("hourM", await tempo(operations[i], false))
-            addText("taxa", String("R$ " + parseFloat(await getValueCC(await getCC(operations[i]))).toFixed(2))
+            // OPERATIONS
+
+            addTitle("mp", "Operações", "opera")
+            addTitle("desc", "Centro de Custos", "cc")
+            addTitle("unid", "Média Hora", "hour")
+            addTitle("qtde", "Hora Máxima", "hourM")
+            addTitle("rsuni", "Taxa Hora MOD", "taxa")
+            addTitle("conj", "Custo Médio", "medio")
+            addTitle("rstotal", "Custo Máximo", "max")
+
+            operations = operations.sort()
+            for (i in operations) {
+                addText("opera", String(operations[i]).split(" - ")[0])
+                addText("cc", await getCC(operations[i]))
+                addText("hour", await tempo(operations[i], true))
+                addText("hourM", await tempo(operations[i], false))
+                addText("taxa", String("R$ " + parseFloat(await getValueCC(await getCC(operations[i]))).toFixed(2))
+                    .replace(".", ","))
+
+                let custoMedio = parseFloat(await tempo(operations[i], true, true) *
+                    await getValueCC(await getCC(operations[i]))).toFixed(2)
+                let custoMaximo = parseFloat(await tempo(operations[i], false, true) *
+                    await getValueCC(await getCC(operations[i]))).toFixed(2)
+
+                totalMedio += parseFloat(custoMedio)
+                totalMaximo += parseFloat(custoMaximo)
+                addText("medio", "R$ " + String(custoMedio).replace(".", ","))
+                addText("max", "R$ " + String(custoMaximo).replace(".", ","))
+            }
+
+            // GERAIS
+
+            for (i = 0; i < 2; i++) {
+                addBr("opera")
+                addBr("cc")
+                addBr("hour")
+                addBr("hourM")
+            }
+            addBr("taxa")
+            addBr("medio")
+            addBr("max")
+
+            addText("taxa", "Total MOD: ")
+            addText("medio", "R$ " + String(parseFloat(totalMedio).toFixed(2))
+                .replace(".", ","))
+            addText("max", "R$ " + String(parseFloat(totalMaximo).toFixed(2))
                 .replace(".", ","))
 
-            // console.log(operations[i])
-            let custoMedio = parseFloat(await tempo(operations[i], true, true) *
-                await getValueCC(await getCC(operations[i]))).toFixed(2)
-            let custoMaximo = parseFloat(await tempo(operations[i], false, true) *
-                await getValueCC(await getCC(operations[i]))).toFixed(2)
+            for (i = 0; i < 2; i++) {
+                addBr("opera")
+                addBr("cc")
+                addBr("hour")
+                addBr("hourM")
+            }
 
-            totalMedio += parseFloat(custoMedio)
-            totalMaximo += parseFloat(custoMaximo)
-            // console.log(i)
-            addText("medio", "R$ " + String(custoMedio).replace(".", ","))
-            addText("max", "R$ " + String(custoMaximo).replace(".", ","))
+            addText("taxa", "Total Geral: ")
+            addText("medio", "R$ " + parseFloat(parseFloat(totalMP) + totalMedio).toFixed(2), false,
+                true, "geralMedio")
+            localStorage.setItem("totalMedio", parseFloat(totalMP) + totalMedio)
+            addText("max", "R$ " + parseFloat(parseFloat(totalMP) + totalMaximo).toFixed(2), false,
+                true, "geralMax")
+            localStorage.setItem("totalMaximo", parseFloat(totalMP) + totalMaximo)
+
+            addBr("taxa")
+            addBr("medio")
+            addBr("max")
+            setInterval(() => {
+                document.querySelector("p.geralMedio").textContent = "R$ " + String(parseFloat(parseFloat(totalMP) + totalMedio).toFixed(2))
+                    .replace(".", ",")
+                document.querySelector("p.geralMax").textContent = "R$ " + String(parseFloat(parseFloat(totalMP) + totalMaximo).toFixed(2))
+                    .replace(".", ",")
+            }, 1000);
+        } catch {
+            ipcRenderer.send("back")
         }
 
-        // GERAIS
-
-        for (i = 0; i < 2; i++) {
-            addBr("opera")
-            addBr("cc")
-            addBr("hour")
-            addBr("hourM")
-        }
-        addBr("taxa")
-        addBr("medio")
-        addBr("max")
-
-        addText("taxa", "Total MOD: ")
-        addText("medio", "R$ " + String(parseFloat(totalMedio).toFixed(2))
-            .replace(".", ","))
-        addText("max", "R$ " + String(parseFloat(totalMaximo).toFixed(2))
-            .replace(".", ","))
-
-        for (i = 0; i < 2; i++) {
-            addBr("opera")
-            addBr("cc")
-            addBr("hour")
-            addBr("hourM")
-        }
-
-        // console.log(totalMP)
-        addText("taxa", "Total Geral: ")
-        addText("medio", "R$ " + parseFloat(parseFloat(totalMP) + totalMedio).toFixed(2), false,
-            true, "geralMedio")
-        localStorage.setItem("totalMedio", parseFloat(totalMP) + totalMedio)
-        addText("max", "R$ " + parseFloat(parseFloat(totalMP) + totalMaximo).toFixed(2), false,
-            true, "geralMax")
-        localStorage.setItem("totalMaximo", parseFloat(totalMP) + totalMaximo)
-
-        addBr("taxa")
-        addBr("medio")
-        addBr("max")
-        setInterval(() => {
-            document.querySelector("p.geralMedio").textContent = "R$ " + String(parseFloat(parseFloat(totalMP) + totalMedio).toFixed(2))
-                .replace(".", ",")
-            document.querySelector("p.geralMax").textContent = "R$ " + String(parseFloat(parseFloat(totalMP) + totalMaximo).toFixed(2))
-                .replace(".", ",")
-        }, 1000);
-
-        // console.log(totalMedio, totalMaximo)
     }
 }

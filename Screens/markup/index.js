@@ -116,6 +116,8 @@ let totalMaximo = 0
 
 window.onload = async () => {
 
+    document.title = "Markup - " + localStorage.getItem("empresa")
+
     if (fs.existsSync(join(__dirname, "..", "..", "impostos.json"))) {
         let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "impostos.json")))
 
@@ -152,6 +154,7 @@ window.onload = async () => {
 
     document.getElementById("add").addEventListener("click", async () => {
         let operations = perform()
+        let services = perform("services")
 
         if (localStorage.getItem("editItem") != 0) {
             let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
@@ -175,6 +178,7 @@ window.onload = async () => {
 
                 baseData[localStorage.getItem("editId")][0][mp + 5] = localStorage.getItem("pvMax")
                 baseData[localStorage.getItem("editId")][0][mp + 6] = operations
+                baseData[localStorage.getItem("editId")][0][mp + 8] = perform("services")
                 baseData[localStorage.getItem("editId")][0][mp + 7] = perform("infos")
 
                 console.log(baseData)
@@ -210,6 +214,7 @@ window.onload = async () => {
                 localStorage.getItem("pvMax"),
                 operations,
                 perform("infos"),
+                services,
                 parseFloat(document.getElementById("ipi").value)
             ])
 
@@ -218,15 +223,14 @@ window.onload = async () => {
             localStorage.setItem("opt", "")
             localStorage.setItem("qtde", "")
             localStorage.setItem("pvMin", "")
+            localStorage.setItem("services", "")
             localStorage.setItem("pvMax", "")
 
             ipcRenderer.send("openShop")
 
             await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
                 JSON.stringify(data))
-        } else {
-            ipcRenderer.send("backMain")
-        }
+        } else ipcRenderer.send("backMain")
     })
 
     document.getElementById("new").addEventListener("click", async () => {
@@ -248,6 +252,7 @@ window.onload = async () => {
         localStorage.setItem("ipi", document.getElementById("ipi").value)
         localStorage.setItem("onlyView", 0)
         ipcRenderer.send("closeShop")
+        ipcRenderer.send("backMain")
         ipcRenderer.send("orcamentPDF")
     })
 

@@ -1,4 +1,4 @@
-const { ipcRenderer, ipcMain } = require("electron")
+const { ipcRenderer } = require("electron")
 const fs = require("fs")
 const { join } = require("path")
 
@@ -14,14 +14,12 @@ window.onload = async () => {
     document.getElementById("l1").style.display = "none"
     document.getElementById("l2").style.display = "none"
     document.getElementById("cav").style.display = "none"
-    document.getElementById("higie").style.display = "none"
     document.getElementById("info").textContent = ""
     document.getElementById("rmv").addEventListener("click", () => removeMP())
 
     try {
-        let empresa = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "config.json")))["empresa"]
-        localStorage.setItem("empresa", empresa)
-        console.log(empresa)
+        let empresa = localStorage.getItem("empresa")
+        document.title = "Mesa - " + empresa
 
         // if (empresa == undefined) empresa = localStorage.getItem("empresa")
         // else if (localStorage.getItem("empresa") != empresa)
@@ -129,8 +127,6 @@ window.onload = async () => {
                 }
             })
             if (show) {
-                localStorage.setItem("higie", document.getElementById("hii").checked)
-
                 localStorage.setItem("mpSelected", mp)
                 localStorage.setItem("opt", name)
                 localStorage.setItem("infos", infos)
@@ -270,7 +266,6 @@ function addOptions() {
     document.getElementById("l1").style.display = "none"
     document.getElementById("l2").style.display = "none"
     document.getElementById("cav").style.display = "none"
-    document.getElementById("higie").style.display = "none"
     let rows = []
 
     if (document.getElementById("options")[1] != undefined) {
@@ -310,8 +305,6 @@ function adjustInputs() {
         document.getElementById("l1").value = 420
         document.getElementsByName('l1')[0].placeholder = 'Lado 1 em mm'
         document.getElementsByName('l2')[0].placeholder = 'Lado 2 em mm'
-        document.getElementById("higie").style.marginTop = "-20px"
-        document.getElementById("higie").style.marginBottom = "-24px"
     } else if (String(mp).startsWith("EVA")) {
         document.getElementById("cav").style.display = "none"
         document.getElementById("bob").style.display = "none"
@@ -324,8 +317,6 @@ function adjustInputs() {
         document.getElementsByName('l1')[0].placeholder = 'Largura'
         document.getElementsByName('l2')[0].placeholder = 'Comprimento'
     }
-
-    document.getElementById("higie").style.display = "block"
 
 }
 

@@ -64,6 +64,7 @@ function isUpperCase(str) {
 }
 
 window.onload = async () => {
+    document.title = "Itens - " + localStorage.getItem("empresa")
     document.getElementById("confirm").addEventListener("click", async () => {
         localStorage.setItem("onlyView", 0)
         localStorage.setItem("finished", 1)
@@ -96,15 +97,15 @@ window.onload = async () => {
                     addText("rstotalmed", "R$ " + precoM, false)
                     totalMedio += precoM
 
-                    addText("ipimed", "R$ " + (precoM * (data[i][j + 7] / 100)).toFixed(2), false)
-                    ipiMedio += precoM * (data[i][j + 7] / 100)
+                    addText("ipimed", "R$ " + (precoM * (data[i][j + 8] / 100)).toFixed(2), false)
+                    ipiMedio += precoM * (data[i][j + 8] / 100)
 
                     precoM = parseFloat(data[i][j + 4])
                     addText("rstotalmax", "R$ " + precoM.toFixed(2), false)
                     totalMaximo += precoM
 
-                    addText("ipimax", "R$ " + (precoM * (data[i][j + 7] / 100)).toFixed(2), false)
-                    ipiMax += precoM * (data[i][j + 7] / 100)
+                    addText("ipimax", "R$ " + (precoM * (data[i][j + 8] / 100)).toFixed(2), false)
+                    ipiMax += precoM * (data[i][j + 8] / 100)
                 }
             }
         }

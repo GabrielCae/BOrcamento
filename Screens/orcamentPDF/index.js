@@ -149,6 +149,9 @@ ipcRenderer.on("showContent", () => {
 })
 
 window.onload = async () => {
+    document.title = localStorage.getItem("empresa") != undefined ||
+        localStorage.getItem("empresa") != "" ? "Orçamento - " + localStorage.getItem("empresa") : "Orçamento"
+
     let totalMedio = 0
     let totalMaximo = 0
     let ipiMax = 0
@@ -239,9 +242,6 @@ window.onload = async () => {
 
         var data = new Date().toLocaleDateString();
         document.getElementById("data").textContent = data
-        let preco = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..",
-            localStorage.getItem("empresa") == "EMBAMED" ?
-                "mpEmb.json" : "mpTerm.json")))
 
         if (localStorage.getItem("mpSelected") != "" && localStorage.getItem("operations") != "" &&
             localStorage.getItem("pvMin") != "") {
@@ -268,10 +268,12 @@ window.onload = async () => {
 
             orcament.push(perform())
             orcament.push(perform("info"))
+            orcament.push(perform("services"))
         }
 
         if (fs.existsSync(join(__dirname, "..", "..", "temp.json"))) {
             let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
+            console.log(data)
 
             for (i in data) {
                 addText("id", parseFloat(i) + 1, false)
@@ -283,12 +285,12 @@ window.onload = async () => {
                 addText("rstotalmed", "R$ " + precoM.toFixed(2))
                 totalMedio += precoM
 
-                let ipiTemp = (data[i][7] / 100) * precoM
+                let ipiTemp = (data[i][8] / 100) * precoM
                 addText("ipimed", "R$ " + parseFloat(ipiTemp).toFixed(2))
                 ipiMedio += parseFloat(ipiTemp)
 
                 precoM = parseFloat(data[i][4])
-                ipiTemp = (data[i][7] / 100) * precoM
+                ipiTemp = (data[i][8] / 100) * precoM
                 addText("ipimax", "R$ " + parseFloat(ipiTemp).toFixed(2))
                 ipiMax += parseFloat(ipiTemp)
 
@@ -297,6 +299,7 @@ window.onload = async () => {
 
                 orcament.push(data[i][5])
                 orcament.push(data[i][6])
+                orcament.push(data[i][7])
             }
 
             // console.log(Array(operations).push("AA"))

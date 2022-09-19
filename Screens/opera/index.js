@@ -34,12 +34,14 @@ function next() {
 
     if (operations.length != 0) {
         localStorage.setItem("operations", operations)
-        ipcRenderer.send("report")
+        ipcRenderer.send("chooseSer")
     } else ipcRenderer.send("showMsg",
         ["Selecione pelo menos uma operação para gerar o orçamento.", "Info"])
 }
 
 window.onload = async () => {
+    document.title = "Operações - " + localStorage.getItem("empresa")
+
     document.getElementById("back").addEventListener("click", () => ipcRenderer.send("backTo"))
     document.getElementById("help").addEventListener("click", () => ipcRenderer.send("showMsg",
         ["Monte uma planilha com o seguinte formato: \n\nOperação (Coluna A) - Centro de Custo (Coluna B) - Tempo/min (Decimal) (Coluna C)",

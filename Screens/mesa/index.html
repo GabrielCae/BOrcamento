@@ -3,7 +3,7 @@
 
 <head>
     <meta charset='utf-8'>
-    <title>Novo Orçamento</title>
+    <title>Mesa</title>
     <link rel='stylesheet' href='index.css'>
     <link href="https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:wght@400;700&display=swap" rel="stylesheet">
     <script src='index.js'></script>
@@ -16,7 +16,7 @@
         <h1>Informações da Mesa</h1>
         <p id="mate">Escolha o material</p>
         <div class="selectDiv">
-            <img id="rmv" src="../../assets/dButton.png" alt="termedic">
+            <!-- <img id="rmv" src="../../assets/dButton.png" alt="termedic"> -->
             <select onchange="showOpts()" name="Materiais" id="materials">
                 <option value=""></option>
             </select>
@@ -40,10 +40,10 @@
         <img src="../../assets/arrow.png" alt="arrow" id="back">
         <img src="../../assets/arrow-right.png" alt="arrow" id="right">
 
-        <div id="higie" class="higi">
+        <!-- <div id="higie" class="higi">
             <label>Higienizado</label>
             <input type="checkbox" id="hii">
-        </div>
+        </div> -->
 
         <p id="info"></p>
 
@@ -51,6 +51,7 @@
     
     <div class="buttons">
         <button type="button" id="addMP" onclick="modify('a')">Adicionar</button>
+        <button type="button" id="rmv">Excluir</button>
         <button type="button" id="modifyMP" onclick="modify('m')">Modificar</button>
         <button type="button" id="higi" onclick="modify('h')">Preço Higienização</button>
     </div>

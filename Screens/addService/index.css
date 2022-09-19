@@ -1,0 +1,134 @@
+.values {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+p#actualValueH{ 
+    display: none;
+}
+
+.higie {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    text-align: center;
+}
+
+img#confirm {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    bottom: 20px;
+    right: 20px;
+}
+
+img#confirm:hover {
+    cursor: pointer;
+}
+
+input#check {
+    margin-right: -80px;
+    margin-left: -200px;
+}
+
+label#checkA {
+    margin-left: -100px;
+    margin-top: 5px;
+}
+
+.content {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+.values {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+.showContent {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+#info {
+    color: #FFFFFF;
+    background-color: #646162;
+    font-size: 25px;
+    border-radius: 8px;
+    width: 100%;
+}
+
+h1 {
+    font-family: 'Gentium Book Plus', serif;
+    font-size: 35px;
+    font-weight: 700;
+    margin-top: 100px;
+    margin-bottom: 35px;
+}
+
+select {
+    margin-top: 15px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    display: grid;
+
+    font-size: 15px;
+    width: 250px;
+    user-select: none;
+    outline: 0;
+
+    border-radius: 8px;
+    height: 20px;
+    width: 100%;
+    margin-bottom: 20px;
+    height: 30px;
+    font-size: 20px;
+}
+
+input {
+    width: 400px;
+    margin-top: 80px;
+
+    font-size: 20px;
+    border-radius: 20px;
+    text-align: center;
+
+    user-select: none;
+    outline: 0;
+    border-color: #383737;
+    margin-bottom: 25px;
+    margin-top: 10px;
+}
+
+img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 90px;
+}
+
+p {
+    font-size: 20px;
+    margin-top: 50px;
+    margin-bottom: -35px;
+}
+
+label {
+    font-size: 20px;
+}
