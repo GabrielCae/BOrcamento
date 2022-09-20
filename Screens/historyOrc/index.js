@@ -12,7 +12,7 @@ window.onload = async () => {
 
         for (i in data) {
             let opt = document.createElement("option")
-            opt.textContent = i
+            opt.textContent = parseInt(i)+1
             select.appendChild(opt)
         }
         
@@ -29,7 +29,7 @@ function loadOrcament() {
     if (selectValue != "") {
         localStorage.setItem("onlyView", 1)
         select.value = ""
-        localStorage.setItem("idToView", parseInt(selectValue))
+        localStorage.setItem("idToView", parseInt(selectValue)-1)
         ipcRenderer.send("loadOrcament")
     }
 }

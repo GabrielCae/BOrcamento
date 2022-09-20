@@ -81,6 +81,15 @@ h3#title {
     border-bottom: 2px dashed rgb(136, 134, 134);
 }
 
+img#imgNew {
+    height: 45px;
+    width: 45px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    cursor: pointer;
+}
+
 h3#sin {
     position: absolute;
     top: 110px;

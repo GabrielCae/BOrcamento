@@ -63,7 +63,7 @@ window.onload = async () => {
         for (i in data) {
             let j = Object.keys(data).indexOf(i)
             addText("opera", operaList[j], true)
-            addText("cc", "R$ "+data[operaList[j]])
+            addText("cc", "R$ " + data[operaList[j]])
             // console.log(i)
         }
     } else {
@@ -79,13 +79,26 @@ window.onload = async () => {
     if (localStorage.getItem("editItem") != 0) {
         let inputs = document.querySelectorAll("input");
         console.log(localStorage.getItem("editItem"))
-        let data = localStorage.getItem("editItem") == 1 ? 
-            JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json"))) : 
+        let data = localStorage.getItem("editItem") == 1 ?
+            JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json"))) :
             JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
 
-        
-        if (localStorage.getItem("editItem") == 2) data = data[localStorage.getItem("editId")][0]
-        else data = data[localStorage.getItem("editId")]
+
+        data = data[localStorage.getItem("editId")][0]
+        console.log(data)
+        className = parseInt(localStorage.getItem("editName"))
+
+        data = [
+            data[className],
+            data[className+1],
+            data[className+2],
+            data[className+3],
+            data[className+4],
+            data[className+5],
+            data[className+6],
+            data[className+7],
+            data[className+8],
+        ]
         console.log(data)
 
         inputs.forEach(i => {

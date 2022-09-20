@@ -49,7 +49,6 @@ window.onload = async () => {
             className = localStorage.getItem("onlyView") == 1 ?
                 parseFloat(localStorage.getItem("editName")) :
                 0 + (parseFloat(localStorage.getItem("editName")) - 1) * 8
-            // console.log(className, data, parseFloat(localStorage.getItem("editName")))
 
             localStorage.setItem("mpp", className)
 
@@ -62,6 +61,7 @@ window.onload = async () => {
                 data[0][className + 5],
                 data[0][className + 6],
                 data[0][className + 7],
+                data[0][className + 8],
             ]
         }
         console.log(data)

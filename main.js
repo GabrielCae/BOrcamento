@@ -231,6 +231,7 @@ app.on("ready", async (event) => {
     Menu.setApplicationMenu(mainMenu);
 
     // mainWin.webContents.openDevTools()
+    mainWin.webContents.executeJavaScript(`localStorage.setItem("add", 0)`)
 
     //--- Shortcuts ---
     globalShortcut.register('CmdOrCtrl+=', () => {
@@ -553,6 +554,8 @@ ipcMain.on("loadOrcament", () => {
         })
         valueChangeWin.on("close", () => valueChangeWin = undefined)
     } else valueChangeWin.focus()
+
+    // valueChangeWin.webContents.openDevTools()
 
     valueChangeWin.loadFile(join(__dirname, "Screens", "orcamentPDF", "index.html"))
 })

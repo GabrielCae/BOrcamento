@@ -84,9 +84,9 @@ async function removeMP(className) {
             // console.log(data)
             newData = [data[i][0], data[i][1], data[i][2]]
             if (localStorage.getItem("onlyView") == 0)
-                className = 0 + (parseFloat(className) - 1) * 8
+                className = 0 + (parseFloat(className) - 1) * 9
 
-            newData[0].splice(className, 8)
+            newData[0].splice(className, 9)
         }
     }
 
@@ -106,6 +106,17 @@ async function editMP(className) {
         localStorage.getItem("idToView")
         : id)
     localStorage.setItem("editName", className)
+
+    ipcRenderer.send("backTo")
+}
+
+async function addMP(className) {
+    localStorage.setItem("editItem", 0)
+    localStorage.setItem("editId", localStorage.getItem("onlyView") == 1 ?
+        localStorage.getItem("idToView")
+        : id)
+    localStorage.setItem("editName", "")
+    localStorage.setItem("add", 1)
 
     ipcRenderer.send("backTo")
 }
@@ -149,6 +160,8 @@ ipcRenderer.on("showContent", () => {
 })
 
 window.onload = async () => {
+    document.getElementById("imgNew").addEventListener("click", () => addMP());
+
     document.title = localStorage.getItem("empresa") != undefined ||
         localStorage.getItem("empresa") != "" ? "Orçamento - " + localStorage.getItem("empresa") : "Orçamento"
 
@@ -165,7 +178,7 @@ window.onload = async () => {
             if (i == localStorage.getItem("idToView")) infos = data[i]
         }
 
-        console.log(infos)
+        // console.log(infos)
         let j = 0
 
         for (i = 0; i < infos[0].length; i++) {
@@ -335,6 +348,9 @@ window.onload = async () => {
             JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
         json[id] = [orcament, data, localStorage.getItem("ipi")]
         await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"), JSON.stringify(json))
+        try {
+            await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
+        } catch {  }
     }
 
 }

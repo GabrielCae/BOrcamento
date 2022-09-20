@@ -202,34 +202,65 @@ window.onload = async () => {
         await fs.writeFileSync(join(__dirname, "..", "..", "impostos.json"), JSON.stringify(json))
 
         if (localStorage.getItem("editItem") < 2) {
-            let data = fs.existsSync(join(__dirname, "..", "..", "temp.json")) ?
-                JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json"))) :
-                []
+            if (localStorage.getItem("add") == 0) {
+                let data = fs.existsSync(join(__dirname, "..", "..", "temp.json")) ?
+                    JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "temp.json"))) :
+                    []
 
-            data.push([
-                localStorage.getItem("mpSelected"),
-                localStorage.getItem("opt"),
-                localStorage.getItem("qtde"),
-                localStorage.getItem("pvMin"),
-                localStorage.getItem("pvMax"),
-                operations,
-                perform("infos"),
-                services,
-                parseFloat(document.getElementById("ipi").value)
-            ])
+                data.push([
+                    localStorage.getItem("mpSelected"),
+                    localStorage.getItem("opt"),
+                    localStorage.getItem("qtde"),
+                    localStorage.getItem("pvMin"),
+                    localStorage.getItem("pvMax"),
+                    operations,
+                    perform("infos"),
+                    services,
+                    parseFloat(document.getElementById("ipi").value)
+                ])
 
-            localStorage.setItem("operations", "")
-            localStorage.setItem("mpSelected", "")
-            localStorage.setItem("opt", "")
-            localStorage.setItem("qtde", "")
-            localStorage.setItem("pvMin", "")
-            localStorage.setItem("services", "")
-            localStorage.setItem("pvMax", "")
+                localStorage.setItem("operations", "")
+                localStorage.setItem("mpSelected", "")
+                localStorage.setItem("opt", "")
+                localStorage.setItem("qtde", "")
+                localStorage.setItem("pvMin", "")
+                localStorage.setItem("services", "")
+                localStorage.setItem("pvMax", "")
 
-            ipcRenderer.send("openShop")
+                ipcRenderer.send("openShop")
 
-            await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
-                JSON.stringify(data))
+                await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
+                    JSON.stringify(data))
+            } else {
+                let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+
+                let i = 0
+                for (j in data[localStorage.getItem("editId")][0]) i++
+                data[localStorage.getItem("editId")][0][i] = localStorage.getItem("mpSelected")
+                data[localStorage.getItem("editId")][0][i + 1] = localStorage.getItem("opt")
+                data[localStorage.getItem("editId")][0][i + 2] = parseFloat(localStorage.getItem("pvMin")).toFixed(2)
+
+                let ipiTemp = ((localStorage.getItem("ipi")) / 100 * localStorage.getItem("pvMin"))
+                data[localStorage.getItem("editId")][0][i + 3] = ipiTemp.toFixed(2)
+
+                data[localStorage.getItem("editId")][0][i + 4] = parseFloat(localStorage.getItem("pvMax")).toFixed(2)
+
+                ipiTemp = ((localStorage.getItem("ipi")) / 100 * localStorage.getItem("pvMax"))
+                data[localStorage.getItem("editId")][0][i + 5] = ipiTemp.toFixed(2)
+
+                data[localStorage.getItem("editId")][0][i + 6] = operations
+                console.log(perform("infos"))
+                data[localStorage.getItem("editId")][0][i + 7] = perform("infos")
+                data[localStorage.getItem("editId")][0][i + 8] = perform("services")
+
+                console.log(data[localStorage.getItem("editId")], localStorage.getItem("editId"))
+                await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"), JSON.stringify(data))
+                localStorage.setItem("add", 0)
+
+                localStorage.setItem("onlyView", 1)
+                localStorage.setItem("idToView", localStorage.getItem("editId"))
+                ipcRenderer.send("loadOrcament")
+            }
         } else ipcRenderer.send("backMain")
     })
 
