@@ -75,20 +75,6 @@ function importar() {
     ipcRenderer.send("importar", "report")
 }
 
-ipcRenderer.on("reportData", async (event, arg) => {
-    let cc = {}
-    await xlsxFile(arg).then((rows) => {
-        for (i in rows) {
-            if (rows[i][0] != null && !isNaN(rows[i][1])) cc[rows[i][0]] = rows[i][1]
-        }
-    })
-
-    // console.log(cc)
-    await fs.writeFileSync(join(__dirname, "..", "..", "cc.json"), JSON.stringify(cc))
-    location.reload()
-
-})
-
 function info(text) {
     ipcRenderer.send("showMsg", [text, "Info"])
 }
@@ -114,9 +100,14 @@ function calc() {
 let totalMedio = 0
 let totalMaximo = 0
 
+let path
+
 window.onload = async () => {
 
     document.title = "Markup - " + localStorage.getItem("empresa")
+    path = localStorage.getItem("empresa") == "EMBAMED" ?
+        join(__dirname, "..", "..", "orcamentosEmb.json") :
+        join(__dirname, "..", "..", "orcamentosTerm.json")
 
     if (fs.existsSync(join(__dirname, "..", "..", "impostos.json"))) {
         let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "impostos.json")))
@@ -166,7 +157,7 @@ window.onload = async () => {
                 await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"), JSON.stringify(data))
             } else {
 
-                let baseData = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+                let baseData = JSON.parse(fs.readFileSync(path))
                 let mp = parseFloat(localStorage.getItem("mpp"))
 
                 baseData[localStorage.getItem("editId")][0][mp + 2] = localStorage.getItem("pvMin")
@@ -182,7 +173,7 @@ window.onload = async () => {
                 baseData[localStorage.getItem("editId")][0][mp + 7] = perform("infos")
 
                 console.log(baseData)
-                await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"),
+                await fs.writeFileSync(path,
                     JSON.stringify(baseData))
 
                 localStorage.setItem("onlyView", 1)
@@ -232,7 +223,7 @@ window.onload = async () => {
                 await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
                     JSON.stringify(data))
             } else {
-                let data = JSON.parse(await fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+                let data = JSON.parse(await fs.readFileSync(path))
 
                 let i = 0
                 for (j in data[localStorage.getItem("editId")][0]) i++
@@ -254,7 +245,7 @@ window.onload = async () => {
                 data[localStorage.getItem("editId")][0][i + 8] = perform("services")
 
                 console.log(data[localStorage.getItem("editId")], localStorage.getItem("editId"))
-                await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"), JSON.stringify(data))
+                await fs.writeFileSync(path, JSON.stringify(data))
                 localStorage.setItem("add", 0)
 
                 localStorage.setItem("onlyView", 1)
@@ -265,6 +256,12 @@ window.onload = async () => {
     })
 
     document.getElementById("new").addEventListener("click", async () => {
+        if (localStorage.getItem("add") == 1) {
+            ipcRenderer.send("confirm", "newOrAdd",
+                `Deseja adicionar o item ao orçamento existente (Orçamento: ${parseInt(localStorage.getItem("editId")) + 1}) ou deseja criar um novo?\nObs: Ao criar um novo, este item será perdido e, caso queira, terá que recriá-lo mais tarde.`,
+                ["Adicionar", "Novo", "Cancelar"])
+            return
+        }
         try {
             await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
         }
@@ -274,11 +271,11 @@ window.onload = async () => {
     })
 
     document.getElementById("confirm").addEventListener("click", async () => {
-        if (localStorage.getItem("finished") == 1) {
-            localStorage.setItem("finished", 0)
-            try {
-                await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
-            } catch { }
+        if (localStorage.getItem("add") == 1) {
+            ipcRenderer.send("confirm", "confirmOrAdd",
+                `Deseja adicionar o item ao orçamento existente (Orçamento: ${parseInt(localStorage.getItem("editId")) + 1}) ou a um novo?`,
+                ["Adicionar", "Novo", "Cancelar"])
+            return
         }
         localStorage.setItem("ipi", document.getElementById("ipi").value)
         localStorage.setItem("onlyView", 0)
@@ -295,3 +292,22 @@ window.onload = async () => {
         ipcRenderer.send("report")
     })
 }
+
+// --- IPC Events ---
+ipcRenderer.on("confirmOrAdd", (event, rsp) => {
+    console.log(rsp)
+    if (rsp == 0) document.getElementById("add").click()
+    else if (rsp == 1) {
+        localStorage.setItem("add", 0)
+        document.getElementById("confirm").click()
+    }
+})
+
+ipcRenderer.on("newOrAdd", (event, rsp) => {
+    console.log(rsp)
+    if (rsp == 0) document.getElementById("add").click()
+    else if (rsp == 1) {
+        localStorage.setItem("add", 0)
+        document.getElementById("new").click()
+    }
+})

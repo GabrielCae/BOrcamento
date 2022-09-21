@@ -3,6 +3,7 @@ const fs = require('fs')
 const { join } = require('path')
 
 let orcament = []
+let path
 
 async function addText(id, text, orc = true, rmvEdit = false, classP = "") {
     let div = document.createElement("div")
@@ -74,7 +75,7 @@ function generatePDF() {
 }
 
 async function removeMP(className) {
-    let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+    let data = await JSON.parse(fs.readFileSync(path))
     // console.log(data)
     let newData = []
 
@@ -92,7 +93,7 @@ async function removeMP(className) {
 
     data[localStorage.getItem("onlyView") == 1 ? localStorage.getItem("idToView") : id] = newData
     console.log(data)
-    await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"), JSON.stringify(data))
+    await fs.writeFileSync(path, JSON.stringify(data))
     if (localStorage.getItem("onlyView") == 0) {
         localStorage.setItem("onlyView", 1)
         localStorage.setItem("idToView", id)
@@ -124,6 +125,7 @@ async function addMP(className) {
 ipcRenderer.on("hideContent", (event, arg) => {
     if (arg != undefined) {
         document.getElementById("pdf").style.display = "none"
+        document.getElementById("imgNew").style.display = "none"
 
         let img = document.querySelectorAll("img");
         img.forEach(i => {
@@ -155,6 +157,7 @@ ipcRenderer.on("showContent", () => {
     })
 
     document.getElementById("pdf").style.display = "grid"
+    document.getElementById("imgNew").style.display = "flex"
     document.getElementById("rmv").style.display = "flex"
     document.getElementById("edit").style.display = "flex"
 })
@@ -170,8 +173,12 @@ window.onload = async () => {
     let ipiMax = 0
     let ipiMedio = 0
 
+    path = localStorage.getItem("empresa") == "EMBAMED" ?
+        join(__dirname, "..", "..", "orcamentosEmb.json") :
+        join(__dirname, "..", "..", "orcamentosTerm.json")
+
     if (localStorage.getItem("onlyView") == 1) {
-        let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+        let data = await JSON.parse(fs.readFileSync(path))
         let infos = []
 
         for (i in data) {
@@ -239,19 +246,19 @@ window.onload = async () => {
         addText("ipimax", "R$ " + ipiMax.toFixed(2), false)
 
         document.getElementById("data").textContent = infos[1]
-        document.getElementById("title").textContent = "Orçamento - " + localStorage.getItem("idToView")
+        document.getElementById("title").textContent = "Orçamento - " + (parseInt(localStorage.getItem("idToView")) + 1)
     } else {
         localStorage.setItem("idToView", "")
-        if (fs.existsSync(join(__dirname, "..", "..", "orcamentos.json"))) {
-            let data = await JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+        if (fs.existsSync(path)) {
+            let data = await JSON.parse(fs.readFileSync(path))
 
             let lastId = 0
             for (i in data) {
                 lastId = i
             }
             id = parseInt(lastId) + 1
-            document.getElementById("title").textContent = "Orçamento - " + id
-        } else document.getElementById("title").textContent = "Orçamento - 0"
+            document.getElementById("title").textContent = "Orçamento - " + (parseInt(id) + 1)
+        } else document.getElementById("title").textContent = "Orçamento - 1"
 
         var data = new Date().toLocaleDateString();
         document.getElementById("data").textContent = data
@@ -340,17 +347,17 @@ window.onload = async () => {
         addText("rstotalmed", "R$ " + totalMedio.toFixed(2), false)
         addText("ipimax", "R$ " + ipiMax.toFixed(2), false)
         addText("rstotalmax", "R$ " + totalMaximo.toFixed(2), false)
-        if (!fs.existsSync(join(__dirname, "..", "..", "orcamentos.json")))
-            await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"),
+        if (!fs.existsSync(path))
+            await fs.writeFileSync(path,
                 JSON.stringify({}))
 
         let json = await
-            JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+            JSON.parse(fs.readFileSync(path))
         json[id] = [orcament, data, localStorage.getItem("ipi")]
-        await fs.writeFileSync(join(__dirname, "..", "..", "orcamentos.json"), JSON.stringify(json))
+        await fs.writeFileSync(path, JSON.stringify(json))
         try {
             await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
-        } catch {  }
+        } catch { }
     }
 
 }

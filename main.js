@@ -256,6 +256,18 @@ app.on("ready", async (event) => {
 })
 
 // --- Ipc Events ---
+ipcMain.on("confirm", async (event, ...args) => {
+    
+    let opts = {
+        buttons: args[2],
+        message: args[1]
+    }
+
+    let response = await dialog.showMessageBoxSync(opts)
+    event.reply(args[0], response)
+
+})
+
 ipcMain.on('getEmpresa', async (event) => {
     try {
         let info = JSON.parse(await fs.readFileSync(join(__dirname, "config.json")))

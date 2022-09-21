@@ -79,9 +79,14 @@ window.onload = async () => {
     if (localStorage.getItem("editItem") != 0) {
         let inputs = document.querySelectorAll("input");
         console.log(localStorage.getItem("editItem"))
+
+        let path = localStorage.getItem("empresa") == "EMBAMED" ?
+            join(__dirname, "..", "..", "orcamentosEmb.json") :
+            join(__dirname, "..", "..", "orcamentosTerm.json")
+
         let data = localStorage.getItem("editItem") == 1 ?
             JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json"))) :
-            JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+            JSON.parse(fs.readFileSync(path))
 
 
         data = data[localStorage.getItem("editId")][0]
@@ -90,14 +95,14 @@ window.onload = async () => {
 
         data = [
             data[className],
-            data[className+1],
-            data[className+2],
-            data[className+3],
-            data[className+4],
-            data[className+5],
-            data[className+6],
-            data[className+7],
-            data[className+8],
+            data[className + 1],
+            data[className + 2],
+            data[className + 3],
+            data[className + 4],
+            data[className + 5],
+            data[className + 6],
+            data[className + 7],
+            data[className + 8],
         ]
         console.log(data)
 

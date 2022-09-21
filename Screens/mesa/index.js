@@ -42,7 +42,11 @@ window.onload = async () => {
             data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "temp.json")))
             data = data[localStorage.getItem("editId")]
         } else {
-            data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "orcamentos.json")))
+            data = JSON.parse(fs.readFileSync(
+                localStorage.getItem("empresa") == "EMBAMED" ?
+                    join(__dirname, "..", "..", "orcamentosEmb.json") :
+                    join(__dirname, "..", "..", "orcamentosTerm.json")
+            ))
             data = data[localStorage.getItem("editId")]
 
             newData = [data[0], data[1], data[2]]
