@@ -99,8 +99,10 @@ function calc() {
 
 let totalMedio = 0
 let totalMaximo = 0
+let show = false
 
 let path
+let impPath
 
 window.onload = async () => {
 
@@ -109,8 +111,12 @@ window.onload = async () => {
         join(__dirname, "..", "..", "orcamentosEmb.json") :
         join(__dirname, "..", "..", "orcamentosTerm.json")
 
-    if (fs.existsSync(join(__dirname, "..", "..", "impostos.json"))) {
-        let data = JSON.parse(fs.readFileSync(join(__dirname, "..", "..", "impostos.json")))
+    impPath = localStorage.getItem("empresa") == "EMBAMED" ?
+        join(__dirname, "..", "..", "impostosEmb.json") :
+        join(__dirname, "..", "..", "impostosTerm.json")
+
+    if (fs.existsSync(impPath)) {
+        let data = JSON.parse(fs.readFileSync(impPath))
 
         document.getElementById("pis").value = data["pis"]
         document.getElementById("ir").value = data["ir"]
@@ -122,10 +128,16 @@ window.onload = async () => {
     document.getElementById("custoMe").textContent = "Custo Médio: R$ " + parseFloat(localStorage.getItem("totalMedio")).toFixed(2)
     document.getElementById("custoMax").textContent = "Custo Máximo: R$ " + parseFloat(localStorage.getItem("totalMaximo")).toFixed(2)
 
+    if (localStorage.getItem("useMed") == 0)
+        document.querySelector("div.custoMeee").style.display = "none"
+    if (localStorage.getItem("useMax") == 0){
+        document.querySelector("div.custoMaxx").style.display = "none"
+        document.querySelector("div.custoMeee").style.marginRight = "0px"
+    }
+
     setInterval(() => {
 
         let inputs = document.querySelectorAll("input");
-        let show = false
         inputs.forEach(i => {
             // console.log(i.value)
             if (i.value != 0 && i.value != "") show = true
@@ -140,10 +152,15 @@ window.onload = async () => {
 
     }, 500);
 
-    if (localStorage.getItem("editItem") != 0)
+    if (localStorage.getItem("editItem") != 0) {
         document.querySelector("p.adddd").textContent = "Atualizar Item"
+        document.getElementById("confirm").style.display = "none"
+        document.getElementById("new").style.display = "none"
+    }
 
     document.getElementById("add").addEventListener("click", async () => {
+        if (!show) return
+
         let operations = perform()
         let services = perform("services")
 
@@ -190,7 +207,7 @@ window.onload = async () => {
             mc: parseFloat(document.getElementById("mc").value),
             ipi: parseFloat(document.getElementById("ipi").value)
         }
-        await fs.writeFileSync(join(__dirname, "..", "..", "impostos.json"), JSON.stringify(json))
+        await fs.writeFileSync(impPath, JSON.stringify(json))
 
         if (localStorage.getItem("editItem") < 2) {
             if (localStorage.getItem("add") == 0) {
@@ -219,6 +236,7 @@ window.onload = async () => {
                 localStorage.setItem("pvMax", "")
 
                 ipcRenderer.send("openShop")
+                localStorage.setItem("noQuest", 1)
 
                 await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
                     JSON.stringify(data))
@@ -234,10 +252,10 @@ window.onload = async () => {
                 let ipiTemp = ((localStorage.getItem("ipi")) / 100 * localStorage.getItem("pvMin"))
                 data[localStorage.getItem("editId")][0][i + 3] = ipiTemp.toFixed(2)
 
-                data[localStorage.getItem("editId")][0][i + 4] = parseFloat(localStorage.getItem("pvMax")).toFixed(2)
+                data[localStorage.getItem("editId")][0][i + 5] = parseFloat(localStorage.getItem("pvMax")).toFixed(2)
 
                 ipiTemp = ((localStorage.getItem("ipi")) / 100 * localStorage.getItem("pvMax"))
-                data[localStorage.getItem("editId")][0][i + 5] = ipiTemp.toFixed(2)
+                data[localStorage.getItem("editId")][0][i + 4] = ipiTemp.toFixed(2)
 
                 data[localStorage.getItem("editId")][0][i + 6] = operations
                 console.log(perform("infos"))
@@ -256,6 +274,8 @@ window.onload = async () => {
     })
 
     document.getElementById("new").addEventListener("click", async () => {
+        if (!show) return
+
         if (localStorage.getItem("add") == 1) {
             ipcRenderer.send("confirm", "newOrAdd",
                 `Deseja adicionar o item ao orçamento existente (Orçamento: ${parseInt(localStorage.getItem("editId")) + 1}) ou deseja criar um novo?\nObs: Ao criar um novo, este item será perdido e, caso queira, terá que recriá-lo mais tarde.`,
@@ -266,6 +286,17 @@ window.onload = async () => {
             await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
         }
         catch { }
+
+        let json = {
+            pis: parseFloat(document.getElementById("pis").value),
+            ir: parseFloat(document.getElementById("ir").value),
+            icms: parseFloat(document.getElementById("icms").value),
+            mc: parseFloat(document.getElementById("mc").value),
+            ipi: parseFloat(document.getElementById("ipi").value)
+        }
+        await fs.writeFileSync(impPath, JSON.stringify(json))
+
+        localStorage.setItem("noQuest", 0)
         localStorage.setItem("editItem", 0)
         ipcRenderer.send("backTo")
     })

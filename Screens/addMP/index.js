@@ -6,6 +6,10 @@ const { join } = require("path");
 
 window.onload = async () => {
     document.title = "MP - " + localStorage.getItem("empresa")
+    document.getElementById("termedic").src = localStorage.getItem("empresa") == "EMBAMED" ?
+    join(__dirname, "..", "..", "assets", "embamed.png") :
+    join(__dirname, "..", "..", "assets", "termedic.png")
+
     document.getElementById("title").textContent = localStorage.getItem("whatDo") == "a" ?
         "Adicionar MP" : localStorage.getItem("whatDo") == "m" ? "Modificar MP" : "Excluir MP"
 
@@ -123,11 +127,17 @@ async function loadOpt() {
             document.getElementById("name").style.display = "grid"
             document.getElementById("lName").style.display = "grid"
 
+            document.getElementById("confirm").src = join(__dirname, "..", "..", "assets",
+            "confirm.png")
+
             actual = 1
         } else if (selectValue == "Modificar") {
             document.getElementById("materials").style.display = "grid"
             document.querySelector("div.showContent").style.display = "none"
             document.querySelector("div.values").style.display = "grid"
+
+            document.getElementById("confirm").src = join(__dirname, "..", "..", "assets",
+            "confirm.png")
 
             actual = 2
 
@@ -136,6 +146,9 @@ async function loadOpt() {
             document.getElementById("materials").style.display = "grid"
             document.querySelector("div.showContent").style.display = "none"
             document.querySelector("div.values").style.display = "none"
+            
+            document.getElementById("confirm").src = join(__dirname, "..", "..", "assets",
+            "dButton.png")
 
             actual = 3
 

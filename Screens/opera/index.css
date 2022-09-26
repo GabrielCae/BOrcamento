@@ -5,6 +5,8 @@ body {
     align-items: center;
     -webkit-justify-content: center;
     justify-content: center;
+    /* background-image: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), url("../../assets/Processos1.png"); */
+    background-image: linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)), url("../../assets/Processos1.png");
 }
 
 .btn {
@@ -15,7 +17,7 @@ body {
 }
 
 button#import {
-    background-color: #646162;
+    background-color: #000000;
 
     border-color: transparent;
     border-radius: 8px;
@@ -50,11 +52,29 @@ h1 {
     width: 100% !important;
 }
 
+p#bold {
+    font-weight: bold;
+    font-size: 19px;
+}
+
+img#process {
+    position: absolute;
+    top: 220px;
+    right: 0px;
+    height: 490px;
+    width: 390px;
+    /* margin-right: 60px; */
+}
+
+img#process:hover {
+    cursor: default;
+}
+
 .table {
     width: 100% !important;
     margin: auto;
-    margin-left: auto;
-    margin-right: auto;
+    /* margin-left: 120px; */
+    margin-right: 120px;
 }
 
 .tableDivs {
@@ -66,7 +86,7 @@ h1 {
 }
 
 .tableDivs input {
-    margin-top: 20px;
+    margin-top: 21px;
 }
 
 .title {
@@ -103,8 +123,8 @@ img#help {
 
 img#back {
     position: fixed;
-    height: 25px;
-    width: 25px;
+    height: 35px;
+    width: 35px;
     top: 20px;
     left: 20px;
 }

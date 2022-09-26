@@ -101,10 +101,31 @@ function info(text) {
 let totalMedio = 0
 let totalMaximo = 0
 
+ipcRenderer.on("chooseR", (event, arg) => {
+    if (arg == 0) {
+        localStorage.setItem("useMax", 1)
+        localStorage.setItem("useMed", 1)
+    } else if (arg == 1) {
+        localStorage.setItem("useMax", 0)
+        localStorage.setItem("useMed", 1)
+    } else {
+        localStorage.setItem("useMax", 1)
+        localStorage.setItem("useMed", 0)
+    }
+
+    ipcRenderer.send("markupScreen")
+})
+
 window.onload = async () => {
     document.title = "Preview - " + localStorage.getItem("empresa")
 
-    document.getElementById("continue").addEventListener("click", () => ipcRenderer.send("markupScreen"))
+    document.getElementById("continue").addEventListener("click", () => {
+        if (localStorage.getItem("noQuest") == 0) {
+            ipcRenderer.send("confirm", "chooseR",
+                "Você deseja usar os dois custos, somente o Custo Médio ou somente o Custo Máximo?",
+                ["Os dois", "Somente R$ Médio", "Somente R$ Máximo"])
+        } else ipcRenderer.send("markupScreen")
+    })
 
     document.getElementById("back").addEventListener("click", async () => {
         ipcRenderer.send("chooseSer")

@@ -33,6 +33,27 @@ input#check {
     margin-left: -200px;
 }
 
+.a {
+    display: flex;
+}
+
+img#mp {
+    /* position: absolute;
+    bottom: 100px;
+    left: -90px; */
+
+    width: 400px;
+    height: 300px;
+    margin-right: 50px;
+}
+
+img#termedic {
+    width: 600px;
+    height: 190px;
+    margin-left: 30px;
+    margin-top: 50px;
+}
+
 label#checkA {
     margin-left: -100px;
     margin-top: 5px;

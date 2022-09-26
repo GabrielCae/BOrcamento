@@ -11,6 +11,12 @@ async function addText(id, text, mod = false) {
 
     if (mod) {
         let inp = document.createElement("input")
+
+        inp.style.height = "18px"
+        inp.style.width = "18px"
+
+        inp.style.backgroundColor = "#000000"
+
         inp.type = "checkbox"
         inp.id = text
         div.appendChild(inp)
@@ -18,6 +24,7 @@ async function addText(id, text, mod = false) {
 
     let p = document.createElement("p")
     p.className = id
+    p.id = "bold"
     p.textContent = String(text).split(" - ")[0]
     div.appendChild(p)
 
@@ -70,7 +77,7 @@ window.onload = async () => {
         for (i in data) {
             let j = Object.keys(data).indexOf(i)
             addText("opera", operaList[j], true)
-            addText("cc", data[operaList[j]][0])
+            addText("cc", String(data[operaList[j]][0]).toUpperCase())
             addText("tempMe", data[operaList[j]][4])
             addText("tempMax", data[operaList[j]][5])
             // console.log(i)
@@ -150,6 +157,12 @@ ipcRenderer.on("operaData", async (event, arg) => {
         opera[i][5] = h.toTimeString().slice(0, 8)
     }
     await fs.writeFileSync(join(__dirname, "..", "..", "operacoes.json"), JSON.stringify(opera))
-    location.reload()
+
+    if (localStorage.getItem("backToMain") == 1) {
+        localStorage.setItem("backToMain", 0)
+        ipcRenderer.send("showMsg", ["Operações importadas com sucesso!", "Info"])
+        ipcRenderer.send("back")
+    }
+    else location.reload()
 })
 

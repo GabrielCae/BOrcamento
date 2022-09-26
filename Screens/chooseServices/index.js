@@ -38,6 +38,10 @@ function next() {
 window.onload = async () => {
     document.title = "Serviços - " + localStorage.getItem("empresa")
 
+    document.getElementById("termedic").src = localStorage.getItem("empresa") == "EMBAMED" ?
+        join(__dirname, "..", "..", "assets", "embamed.png") :
+        join(__dirname, "..", "..", "assets", "termedic.png")
+
     document.getElementById("back").addEventListener("click", () => ipcRenderer.send("operations"))
     document.getElementById("refresh").addEventListener("click", () => location.reload())
 

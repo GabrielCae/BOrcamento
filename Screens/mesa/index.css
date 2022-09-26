@@ -153,8 +153,8 @@ p#mate {
 }
 
 img#back {
-    height: 25px;
-    width: 25px;
+    height: 35px;
+    width: 35px;
     position: absolute;
     top: 20px;
     left: 20px;
@@ -206,7 +206,9 @@ img#termedic {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-left: 90px;
+    margin-left: 10px;
+    width: 600px;
+    height: 190px;
     margin-bottom: -55px;
 }
 

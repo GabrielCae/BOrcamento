@@ -61,6 +61,7 @@ h3#title {
 
 #linha {
     width: 85%;
+    /* height: 2%; */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -100,6 +101,8 @@ img#sintegraImg {
     position: absolute;
     top: -10px;
     right: 80px;
+    width: 150px;
+    height: 150px;
 }
 
 img#termedicImg {
@@ -214,6 +217,12 @@ h1 {
     font-size: 35px;
 }
 
+#termedicImg {
+    margin-left: 10px;
+    width: 300px;
+    height: 95px;
+}
+
 .title {
     font-weight: bold;
 }
@@ -254,8 +263,8 @@ th {
 
 img#back {
     position: fixed;
-    height: 25px;
-    width: 25px;
+    height: 35px;
+    width: 35px;
     top: 20px;
     left: 20px;
 }

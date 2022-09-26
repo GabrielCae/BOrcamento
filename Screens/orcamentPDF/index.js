@@ -83,7 +83,7 @@ async function removeMP(className) {
         if ((localStorage.getItem("onlyView") == 1) ? i == localStorage.getItem("idToView") :
             i == id) {
             // console.log(data)
-            newData = [data[i][0], data[i][1], data[i][2]]
+            newData = [data[i][0], data[i][1], data[i][2], data[i][3]]
             if (localStorage.getItem("onlyView") == 0)
                 className = 0 + (parseFloat(className) - 1) * 9
 
@@ -102,13 +102,26 @@ async function removeMP(className) {
 }
 
 async function editMP(className) {
+    let data = await JSON.parse(fs.readFileSync(path))
+
+    localStorage.setItem("noQuest", 1)
     localStorage.setItem("editItem", 2)
     localStorage.setItem("editId", localStorage.getItem("onlyView") == 1 ?
         localStorage.getItem("idToView")
         : id)
     localStorage.setItem("editName", className)
 
-    ipcRenderer.send("backTo")
+    localStorage.setItem("useMed",
+        data[localStorage.getItem("onlyView") == 1 ?
+            localStorage.getItem("idToView")
+            : id][3][0])
+    localStorage.setItem("useMax",
+        data[localStorage.getItem("onlyView") == 1 ?
+            localStorage.getItem("idToView")
+            : id][3][1])
+    console.log(localStorage.getItem("useMax"), localStorage.getItem("useMed"))
+
+    // ipcRenderer.send("backTo")
 }
 
 async function addMP(className) {
@@ -163,6 +176,14 @@ ipcRenderer.on("showContent", () => {
 })
 
 window.onload = async () => {
+
+    localStorage.setItem("useMax", 1)
+    localStorage.setItem("useMed", 1)
+
+    document.getElementById("termedicImg").src = localStorage.getItem("empresa") == "EMBAMED" ?
+        join(__dirname, "..", "..", "assets", "embamed.png") :
+        join(__dirname, "..", "..", "assets", "termedic.png")
+
     document.getElementById("imgNew").addEventListener("click", () => addMP());
 
     document.title = localStorage.getItem("empresa") != undefined ||
@@ -186,6 +207,13 @@ window.onload = async () => {
         }
 
         // console.log(infos)
+        if (infos[3][0] == 0) {
+            document.querySelector("th#rstotalmed").style.display = "none"
+            document.querySelector("th#ipimed").style.display = "none"
+        } else if (infos[3][1] == 0) {
+            document.querySelector("th#rstotalmax").style.display = "none"
+            document.querySelector("th#ipimax").style.display = "none"
+        }
         let j = 0
 
         for (i = 0; i < infos[0].length; i++) {
@@ -236,7 +264,8 @@ window.onload = async () => {
         let linha = document.createElement("p")
         linha.textContent = ""
         linha.id = "linha"
-        linha.style.marginTop = "50px"
+        // linha.style.height = "8%"
+        linha.style.marginTop = "-30px"
         document.getElementById("desc").appendChild(linha)
 
         addText("desc", "Total: ", false)
@@ -248,6 +277,15 @@ window.onload = async () => {
         document.getElementById("data").textContent = infos[1]
         document.getElementById("title").textContent = "Orçamento - " + (parseInt(localStorage.getItem("idToView")) + 1)
     } else {
+
+        if (localStorage.getItem("useMed") == 0) {
+            document.querySelector("th#rstotalmed").style.display = "none"
+            document.querySelector("th#ipimed").style.display = "none"
+        } else if (localStorage.getItem("useMax") == 0) {
+            document.querySelector("th#rstotalmax").style.display = "none"
+            document.querySelector("th#ipimax").style.display = "none"
+        }
+
         localStorage.setItem("idToView", "")
         if (fs.existsSync(path)) {
             let data = await JSON.parse(fs.readFileSync(path))
@@ -328,6 +366,7 @@ window.onload = async () => {
         let linha = document.createElement("p")
         linha.textContent = ""
         linha.id = "linha"
+        // linha.style.marginTop = "-30px"
         document.getElementById("desc").appendChild(linha)
 
         // console.log(totalMedio, totalMaximo)
@@ -353,7 +392,8 @@ window.onload = async () => {
 
         let json = await
             JSON.parse(fs.readFileSync(path))
-        json[id] = [orcament, data, localStorage.getItem("ipi")]
+        json[id] = [orcament, data, localStorage.getItem("ipi"),
+            [localStorage.getItem("useMed"), localStorage.getItem("useMax")]]
         await fs.writeFileSync(path, JSON.stringify(json))
         try {
             await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))

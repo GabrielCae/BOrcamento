@@ -6,6 +6,11 @@ let mp
 let name
 
 window.onload = async () => {
+
+    document.getElementById("termedic").src = localStorage.getItem("empresa") == "EMBAMED" ?
+        join(__dirname, "..", "..", "assets", "embamed.png") :
+        join(__dirname, "..", "..", "assets", "termedic.png")
+
     localStorage.setItem("qtde", null)
     document.getElementById("back").addEventListener("click", () => ipcRenderer.send("back"))
     document.getElementById("options").style.display = "none"
@@ -264,7 +269,7 @@ function isUpperCase(str) {
 
 function addOptions() {
     document.getElementById("info").textContent = ""
-    document.getElementById("termedic").style.marginLeft = "90px"
+    // document.getElementById("termedic").style.marginLeft = "40px"
     document.getElementById("bob").style.display = "none"
     document.getElementById("esp").style.display = "none"
     document.getElementById("l1").style.display = "none"
@@ -293,7 +298,7 @@ function addOptions() {
 }
 
 function adjustInputs() {
-    document.getElementById("termedic").style.marginLeft = "280px"
+    document.getElementById("termedic").style.marginLeft = "115px"
     document.getElementById("bob").style.display = "flex"
     document.getElementById("esp").style.display = "flex"
     document.getElementById("l1").style.display = "flex"
@@ -309,17 +314,20 @@ function adjustInputs() {
         document.getElementById("l1").value = 420
         document.getElementsByName('l1')[0].placeholder = 'Lado 1 em mm'
         document.getElementsByName('l2')[0].placeholder = 'Lado 2 em mm'
+        document.getElementById("info").style.marginTop = "-20px"
     } else if (String(mp).startsWith("EVA")) {
         document.getElementById("cav").style.display = "none"
         document.getElementById("bob").style.display = "none"
         document.getElementsByName('l1')[0].placeholder = 'Largura'
         document.getElementsByName('l2')[0].placeholder = 'Comprimento'
+        document.getElementById("info").style.marginTop = "20px"
     } else if (String(mp).startsWith("PAPEL")) {
         document.getElementById("bob").style.display = "none"
         document.getElementById("esp").style.display = "none"
         document.getElementById("cav").style.display = "none"
         document.getElementsByName('l1')[0].placeholder = 'Largura'
         document.getElementsByName('l2')[0].placeholder = 'Comprimento'
+        document.getElementById("info").style.marginTop = "20px"
     }
 
 }

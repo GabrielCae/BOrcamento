@@ -97,7 +97,7 @@ app.on("ready", async (event) => {
                                 try {
                                     await fs.unlinkSync(join(__dirname, "temp.json"))
                                 }
-                                catch {  }
+                                catch { }
                             }
                         }
                     }
@@ -129,17 +129,17 @@ app.on("ready", async (event) => {
                     ]
                 },
                 {
-                    label: 'Centro de Custos', 
+                    label: 'Centro de Custos',
                     submenu: [
                         {
                             label: "Importar", async click() {
                                 let response = await dialog.showMessageBoxSync(options6)
-        
+
                                 if (response == 0) {
                                     response2 = await dialog.showMessageBoxSync(options5)
                                     if (fs.existsSync(join(__dirname, "cc.json"))) await fs.unlinkSync(join(__dirname, "cc.json"))
                                     await mainWin.webContents.executeJavaScript("ipcRenderer.send('report')")
-        
+
                                     await mainWin.webContents.executeJavaScript(`ipcRenderer.send("importar", "report")`)
                                     await mainWin.webContents.executeJavaScript(`ipcRenderer.send("showMsg", ["Centro de Custos importados com sucesso!", "Info"])`)
                                 }
@@ -168,11 +168,10 @@ app.on("ready", async (event) => {
 
                         if (response == 0) {
                             response2 = await dialog.showMessageBoxSync(options4)
+                            mainWin.webContents.executeJavaScript("localStorage.setItem('backToMain', 1)")
                             await mainWin.webContents.executeJavaScript("ipcRenderer.send('operations')")
 
                             await mainWin.webContents.executeJavaScript(`ipcRenderer.send("importar", "opera")`)
-                            await mainWin.webContents.executeJavaScript(`ipcRenderer.send("back")`)
-                            await mainWin.webContents.executeJavaScript(`ipcRenderer.send("showMsg", ["Operações importadas com sucesso!", "Info"])`)
                         }
                     }
                 },
@@ -257,7 +256,7 @@ app.on("ready", async (event) => {
 
 // --- Ipc Events ---
 ipcMain.on("confirm", async (event, ...args) => {
-    
+
     let opts = {
         buttons: args[2],
         message: args[1]
@@ -316,6 +315,7 @@ ipcMain.on("openShop", (event, arg) => {
 
     } else shopping.focus()
     shopping.loadFile(join(__dirname, "Screens", "shopping", "index.html"))
+    // shopping.webContents.openDevTools()
 
     mainWin.loadFile(join(__dirname, "Screens", "mesa", "index.html"))
 
@@ -533,19 +533,22 @@ ipcMain.on("emitPDF", (event, arg) => {
 })
 
 ipcMain.on("historyOrc", async () => {
-    historyOrc = new BrowserWindow({
-        width: 1080,
-        height: 720,
-        center: true,
-        autoHideMenuBar: true,
-        icon: join(__dirname, "assets/icon.png"),
-        show: true,
-        webPreferences: {
-            contextIsolation: false,
-            nodeIntegration: true,
-        }
-    })
+    if (historyOrc == undefined) {
+        historyOrc = new BrowserWindow({
+            width: 1080,
+            height: 720,
+            center: true,
+            autoHideMenuBar: true,
+            icon: join(__dirname, "assets/icon.png"),
+            show: true,
+            webPreferences: {
+                contextIsolation: false,
+                nodeIntegration: true,
+            }
+        })
+    } else historyOrc.focus()
     historyOrc.on("close", () => historyOrc = undefined)
+    // historyOrc.webContents.openDevTools()
 
     historyOrc.loadFile(join(__dirname, "Screens", "historyOrc", "index.html"))
 })

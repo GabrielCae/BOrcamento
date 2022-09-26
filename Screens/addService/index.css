@@ -5,8 +5,35 @@
     text-align: center;
 }
 
+.a {
+    display: flex;
+}
+
+img#termedic {
+    width: 600px;
+    height: 190px;
+    margin-left: 30px;
+    margin-top: 100px;
+}
+
+img#serv {
+    /* position: absolute;
+    bottom: 100px;
+    left: -90px; */
+
+    width: 450px;
+    height: 350px;
+    margin-right: 50px;
+}
+
 p#actualValueH{ 
     display: none;
+}
+
+img#termedic {
+    width: 600px;
+    height: 190px;
+    margin-left: -20px;
 }
 
 .higie {
