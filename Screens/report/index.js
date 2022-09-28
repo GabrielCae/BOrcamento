@@ -103,15 +103,15 @@ let totalMaximo = 0
 
 ipcRenderer.on("chooseR", (event, arg) => {
     if (arg == 0) {
-        localStorage.setItem("useMax", 1)
-        localStorage.setItem("useMed", 1)
-    } else if (arg == 1) {
         localStorage.setItem("useMax", 0)
         localStorage.setItem("useMed", 1)
+        localStorage.setItem("totalGe", totalMedio)
     } else {
         localStorage.setItem("useMax", 1)
         localStorage.setItem("useMed", 0)
+        localStorage.setItem("totalGe", totalMaximo)
     }
+
 
     ipcRenderer.send("markupScreen")
 })
@@ -120,11 +120,8 @@ window.onload = async () => {
     document.title = "Preview - " + localStorage.getItem("empresa")
 
     document.getElementById("continue").addEventListener("click", () => {
-        if (localStorage.getItem("noQuest") == 0) {
-            ipcRenderer.send("confirm", "chooseR",
-                "Você deseja usar os dois custos, somente o Custo Médio ou somente o Custo Máximo?",
-                ["Os dois", "Somente R$ Médio", "Somente R$ Máximo"])
-        } else ipcRenderer.send("markupScreen")
+        ipcRenderer.send("confirm", "chooseR",
+            "Você deseja usar o Custo Médio ou o Custo Máximo?", ["R$ Médio", "R$ Máximo"])
     })
 
     document.getElementById("back").addEventListener("click", async () => {
@@ -255,20 +252,19 @@ window.onload = async () => {
             addText("taxa", "Total Geral: ")
             addText("medio", "R$ " + parseFloat(parseFloat(totalMP) + totalMedio).toFixed(2), false,
                 true, "geralMedio")
-            localStorage.setItem("totalMedio", parseFloat(totalMP) + totalMedio)
             addText("max", "R$ " + parseFloat(parseFloat(totalMP) + totalMaximo).toFixed(2), false,
                 true, "geralMax")
-            localStorage.setItem("totalMaximo", parseFloat(totalMP) + totalMaximo)
 
             addBr("taxa")
             addBr("medio")
             addBr("max")
-            setInterval(() => {
-                document.querySelector("p.geralMedio").textContent = "R$ " + String(parseFloat(parseFloat(totalMP) + totalMedio).toFixed(2))
-                    .replace(".", ",")
-                document.querySelector("p.geralMax").textContent = "R$ " + String(parseFloat(parseFloat(totalMP) + totalMaximo).toFixed(2))
-                    .replace(".", ",")
-            }, 1000);
+            document.querySelector("p.geralMedio").textContent = "R$ " + String(parseFloat(parseFloat(totalMP) + totalMedio).toFixed(2))
+                .replace(".", ",")
+            document.querySelector("p.geralMax").textContent = "R$ " + String(parseFloat(parseFloat(totalMP) + totalMaximo).toFixed(2))
+                .replace(".", ",")
+            totalMedio = parseFloat(totalMP) + totalMedio
+            totalMaximo = parseFloat(totalMP) + totalMaximo
+            console.log(totalMedio, totalMaximo)
         } catch {
             ipcRenderer.send("back")
         }

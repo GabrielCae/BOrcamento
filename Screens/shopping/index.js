@@ -64,13 +64,8 @@ function isUpperCase(str) {
 }
 
 window.onload = async () => {
-    if (localStorage.getItem("useMed") == 0) {
-        document.querySelector("th#rstotalmed").style.display = "none"
-        document.querySelector("th#ipimed").style.display = "none"
-    } else if (localStorage.getItem("useMax") == 0) {
-        document.querySelector("th#rstotalmax").style.display = "none"
-        document.querySelector("th#ipimax").style.display = "none"
-    }
+    document.querySelector("th#rstotalmax").style.display = "none"
+    document.querySelector("th#ipimax").style.display = "none"
 
     document.getElementById("termedicImg").src = localStorage.getItem("empresa") == "EMBAMED" ?
         join(__dirname, "..", "..", "assets", "embamed.png") :
@@ -80,7 +75,6 @@ window.onload = async () => {
     document.getElementById("confirm").addEventListener("click", async () => {
         localStorage.setItem("onlyView", 0)
         localStorage.setItem("finished", 1)
-        localStorage.setItem("noQuest", 0)
         ipcRenderer.send("orcamentPDF")
         ipcRenderer.send("closeShop")
     })

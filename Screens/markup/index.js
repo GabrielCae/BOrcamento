@@ -86,19 +86,15 @@ function calc() {
 
     // if (markup < 0) markup *= -1
 
-    let pvMax = parseFloat(localStorage.getItem("totalMaximo") / markup).toFixed(2)
-    let pvMin = parseFloat(localStorage.getItem("totalMedio") / markup).toFixed(2)
+    let precoVenda = parseFloat(localStorage.getItem("totalGe") / markup).toFixed(2)
 
-    localStorage.setItem("pvMax", pvMax)
-    localStorage.setItem("pvMin", pvMin)
+    localStorage.setItem("pvMin", precoVenda)
+    localStorage.setItem("pvMax", precoVenda)
 
-    document.getElementById("custoMeMark").textContent = "Preço Mínimo: R$ " + pvMin
-    document.getElementById("custoMaxMark").textContent = "Preço Máximo: R$ " + pvMax
+    document.getElementById("custoMark").textContent = "Preço: R$ " + precoVenda
     document.getElementById("markup").textContent = "Markup: " + markup.toFixed(4)
 }
 
-let totalMedio = 0
-let totalMaximo = 0
 let show = false
 
 let path
@@ -125,16 +121,7 @@ window.onload = async () => {
         document.getElementById("ipi").value = data["ipi"]
     }
 
-    document.getElementById("custoMe").textContent = "Custo Médio: R$ " + parseFloat(localStorage.getItem("totalMedio")).toFixed(2)
-    document.getElementById("custoMax").textContent = "Custo Máximo: R$ " + parseFloat(localStorage.getItem("totalMaximo")).toFixed(2)
-
-    if (localStorage.getItem("useMed") == 0)
-        document.querySelector("div.custoMeee").style.display = "none"
-    if (localStorage.getItem("useMax") == 0){
-        document.querySelector("div.custoMaxx").style.display = "none"
-        document.querySelector("div.custoMeee").style.marginRight = "0px"
-    }
-
+    document.getElementById("custo").textContent = "Custo: R$ " + parseFloat(localStorage.getItem("totalGe")).toFixed(2)
     setInterval(() => {
 
         let inputs = document.querySelectorAll("input");
@@ -145,8 +132,7 @@ window.onload = async () => {
         })
         if (show) calc()
         else {
-            document.getElementById("custoMeMark").textContent = ""
-            document.getElementById("custoMaxMark").textContent = ""
+            document.getElementById("custo").textContent = ""
             document.getElementById("markup").textContent = ""
         }
 
@@ -236,7 +222,6 @@ window.onload = async () => {
                 localStorage.setItem("pvMax", "")
 
                 ipcRenderer.send("openShop")
-                localStorage.setItem("noQuest", 1)
 
                 await fs.writeFileSync(join(__dirname, "..", "..", "temp.json"),
                     JSON.stringify(data))
@@ -296,7 +281,6 @@ window.onload = async () => {
         }
         await fs.writeFileSync(impPath, JSON.stringify(json))
 
-        localStorage.setItem("noQuest", 0)
         localStorage.setItem("editItem", 0)
         ipcRenderer.send("backTo")
     })

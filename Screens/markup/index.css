@@ -140,13 +140,11 @@ p {
     display: flex;
 }
 
-.custoMeee {
+.custo {
     text-align: center;
     align-content: center;
     justify-content: center;
     display: grid;
-    margin-left: 10px;
-    margin-right: 120px;
 }
 
 .confirm, .add, .new {

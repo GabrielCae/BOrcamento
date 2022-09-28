@@ -104,7 +104,6 @@ async function removeMP(className) {
 async function editMP(className) {
     let data = await JSON.parse(fs.readFileSync(path))
 
-    localStorage.setItem("noQuest", 1)
     localStorage.setItem("editItem", 2)
     localStorage.setItem("editId", localStorage.getItem("onlyView") == 1 ?
         localStorage.getItem("idToView")
@@ -121,7 +120,7 @@ async function editMP(className) {
             : id][3][1])
     console.log(localStorage.getItem("useMax"), localStorage.getItem("useMed"))
 
-    // ipcRenderer.send("backTo")
+    ipcRenderer.send("backTo")
 }
 
 async function addMP(className) {
@@ -177,9 +176,6 @@ ipcRenderer.on("showContent", () => {
 
 window.onload = async () => {
 
-    localStorage.setItem("useMax", 1)
-    localStorage.setItem("useMed", 1)
-
     document.getElementById("termedicImg").src = localStorage.getItem("empresa") == "EMBAMED" ?
         join(__dirname, "..", "..", "assets", "embamed.png") :
         join(__dirname, "..", "..", "assets", "termedic.png")
@@ -207,13 +203,8 @@ window.onload = async () => {
         }
 
         // console.log(infos)
-        if (infos[3][0] == 0) {
-            document.querySelector("th#rstotalmed").style.display = "none"
-            document.querySelector("th#ipimed").style.display = "none"
-        } else if (infos[3][1] == 0) {
-            document.querySelector("th#rstotalmax").style.display = "none"
-            document.querySelector("th#ipimax").style.display = "none"
-        }
+        document.querySelector("th#rstotalmax").style.display = "none"
+        document.querySelector("th#ipimax").style.display = "none"
         let j = 0
 
         for (i = 0; i < infos[0].length; i++) {
@@ -278,13 +269,8 @@ window.onload = async () => {
         document.getElementById("title").textContent = "Orçamento - " + (parseInt(localStorage.getItem("idToView")) + 1)
     } else {
 
-        if (localStorage.getItem("useMed") == 0) {
-            document.querySelector("th#rstotalmed").style.display = "none"
-            document.querySelector("th#ipimed").style.display = "none"
-        } else if (localStorage.getItem("useMax") == 0) {
-            document.querySelector("th#rstotalmax").style.display = "none"
-            document.querySelector("th#ipimax").style.display = "none"
-        }
+        document.querySelector("th#rstotalmax").style.display = "none"
+        document.querySelector("th#ipimax").style.display = "none"
 
         localStorage.setItem("idToView", "")
         if (fs.existsSync(path)) {
@@ -399,5 +385,8 @@ window.onload = async () => {
             await fs.unlinkSync(join(__dirname, "..", "..", "temp.json"))
         } catch { }
     }
+
+    localStorage.setItem("useMax", 1)
+    localStorage.setItem("useMed", 1)
 
 }
